@@ -15,6 +15,10 @@
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 #+end_src
+* ACTIVE Adding local files to load path
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+#+END_SRC
 * ACTIVE Initializing package resources
 #+begin_src emacs-lisp
 (require 'package)
@@ -150,8 +154,118 @@ Your version of Emacs does not support SSL connections."))
     (ac-config-default)
     (global-auto-complete-mode t)
     ))
+;; elisp autocompletion
+(add-hook 'emacs-lisp-mode-hook 'ielm-auto-complete)
 #+end_src
 * ACTIVE Use F5 to reload file into current buffer
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "<f5>") 'revert-buffer)
 #+END_SRC
+* ACTIVE Reveal.js settings
+#+BEGIN_SRC emacs-lisp
+(use-package ox-reveal
+  :ensure ox-reveal)
+
+(setq org-reveal-root "http://cdn.jsdelivr.net/reveal.js/3.0.0/")
+(setq org-reveal-mathjax t)
+
+(use-package htmlize
+  :ensure t)
+#+END_SRC
+* ACTIVE Flycheck
+  #+BEGIN_SRC 
+  (use-package flycheck 
+    :ensure t
+    :init
+    (global-flycheck-mode t))
+  (custom-set-variables
+    '(flycheck-python-flake8-executable "python3")
+    '(flycheck-python-pycompile-executable "python3")
+    '(flycheck-python-pylint-executable "python3")
+  #+END_SRC
+* ACTIVE Python
+  #+BEGIN_SRC emacs-lisp
+
+;; Be sure to meet the following requirements:
+;; mkdir -p ~/.emacs.d/.python-environments
+;; virtualenv -p /usr/local/bin/python3 ~/.emacs.d/.python-environments/jedi  
+;; # or whatever your python3 path is
+;; # If you feel like installing the server with 'M-x jedi:install-server', also do the following
+;;
+;; ~/.emacs.d/.python-environments/jedi/bin/pip install --upgrade ~/.emacs.d/elpa/jedi-20150109.2230/  # you might need to change the version number
+
+(add-hook 'python-mode-hook 'jedi:setup)
+(setq jedi:complete-on-dot t)
+(setq jedi:environment-root "jedi")
+  (setq py-python-command "/usr/bin/python3")
+  (use-package jedi
+    :ensure t
+    :init
+    (add-hook 'python-mode-hook 'jedi:setup)
+    (add-hook 'python-mode-hook 'jedi:ac-setup))
+
+;; Would need these settings for getting elpy to work
+(setq python-shell-interpreter "python3"
+      python-shell-interpreter-args "-i"
+      elpy-rpc-python-command "python3")
+
+(use-package elpy
+  :ensure t
+  :config
+  (elpy-enable))
+  #+END_SRC
+* ACTIVE Linum mode
+#+BEGIN_SRC emacs-lisp
+(use-package linum
+  :ensure t
+  :init
+  (progn
+    (load-file "/home/cr0c0/.emacs.d/lisp/linum-highlight-current-line-number.el")
+    (setq linum-format 'linum-highlight-current-line-number)
+    ;;(set-face-background 'line-number "#033f01a90ccc")
+    ))
+#+END_SRC
+* ACTIVE Undo Tree
+  #+begin_src emacs-lisp
+    (use-package undo-tree
+      :ensure t
+      :init
+      (global-undo-tree-mode))
+  #+end_src
+* ACTIVE Org brain settings
+#+begin_src emacs-lisp
+  (use-package org-brain
+    :ensure t
+    :init
+    (setq org-brain-path "~/org/brain"))
+
+  ;; ascii-art-to-unicode settings
+  (defface aa2u-face '((t . nil))
+    "Face for aa2u box drawing characters")
+  (advice-add #'aa2u-1c :filter-return
+	      (lambda (str) (propertize str 'face 'aa2u-face)))
+  (defun aa2u-org-brain-buffer ()
+    (let ((inhibit-read-only t))
+      (make-local-variable 'face-remapping-alist)
+      (add-to-list 'face-remapping-alist
+		   '(aa2u-face . org-brain-wires))
+      (ignore-errors (aa2u (point-min) (point-max)))))
+  (with-eval-after-load 'org-brain
+    (add-hook 'org-brain-after-visualize-hook #'aa2u-org-brain-buffer))
+
+#+end_src
+
+* ACTIVE Org agenda settings
+#+begin_src emacs-lisp
+  (setq org-agenda-files (list "~/org/brain/todo.org"))
+#+end_src
+* ACTIVE Load cheatsheets
+#+begin_src emacs-lisp
+  (use-package cheatsheet
+    :ensure t)
+  (require 'cheatsheet)
+  (load-file "~/.dotfiles/common/emacs/cheats.el")
+#+end_src
+
+#+RESULTS:
+: t
