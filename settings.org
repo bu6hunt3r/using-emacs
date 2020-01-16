@@ -10,32 +10,24 @@
 #+END_SRC
 * ACTIVE Disabling startup message / menu-bar-mode / tool-bar-mode    
 #+begin_src emacs-lisp
-;;(setq inhibit-startup-message t)
+(setq inhibit-startup-message t)
 (menu-bar-mode -1)
-#+end_src
-* ACTIVE Font settings
-#+begin_src emacs-lisp
-(set-default-font "3270Medium nerd Font Mono Medium")
-(load-file "~/.emacs.d/font-size.el")
-(require 'font-size)
-(font-size-init 14)
-(define-key global-map (kbd "M-+") 'font-size-increase)
-(define-key global-map (kbd "M--") 'font-size-decrease)
-(define-key global-map (kbd "M-0") 'font-size-default)
-#+end_src
-* ACTIVE Theme settings 
-#+begin_src emacs-lisp
-;; theme settings
-(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
-(load-theme `tron-legacy t)
-(set-background-color "#033f01a90ccc")
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
 #+end_src
 * ACTIVE Initializing package resources
 #+begin_src emacs-lisp
 (require 'package)
 (setq package-enable-at-startup nil)
-(add-to-list 'package-archives
-    '("melpa" . "https://melpa.org/packages/"))
+(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
+                    (not (gnutls-availaple-p))))
+       (proto (if no-ssl "http" "https")))
+  (when no-ssl
+    (warn "\
+Your version of Emacs does not support SSL connections."))
+  (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t))
+;; (add-to-list 'package-archives
+;;    '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
 
 ;; Bootstrap use-package
@@ -49,6 +41,34 @@
         :ensure t
         :config
         (which-key-mode))
+#+end_src
+* ACTIVE Theme settings 
+#+begin_src emacs-lisp
+;; theme settings
+;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+;; (load-theme `tron-legacy t)
+;;(use-package nyx-theme
+;;  :ensure t
+;;  :config (load-theme 'nyx t))
+(use-package ujelly-theme
+    :ensure t)
+
+(enable-theme 'ujelly)
+(set-background-color "#033f01a90ccc")
+
+(use-package nyan-mode
+    :ensure t
+    :config (nyan-mode +1)) 
+#+end_src
+* ACTIVE Font settings
+#+begin_src emacs-lisp
+(set-default-font "3270Medium Nerd Font Mono Medium")
+(load-file "~/.emacs.d/font-size.el")
+(require 'font-size)
+(font-size-init 14)
+(define-key global-map (kbd "M-+") 'font-size-increase)
+(define-key global-map (kbd "M--") 'font-size-decrease)
+(define-key global-map (kbd "M-0") 'font-size-default)
 #+end_src
 * ACTIVE Org-mode stuff
 #+begin_src emacs-lisp
@@ -95,3 +115,43 @@
       (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
       ))
 #+end_src
+* ACTIVE Ivy settings...
+#+begin_src emacs-lisp
+(use-package ivy
+  :ensure t
+  :diminish (ivy-mode)
+  :bind (("C-x b" . ivy-switch-buffer))
+  :config
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-display-style 'fancy))
+#+end_src
+* ACTIVE Git gutter
+#+begin_src emacs-lisp
+(use-package git-gutter
+        :ensure t
+        :config
+        (global-git-gutter-mode +1))
+#+end_src
+* ACTIVE Avy settings
+#+begin_src emacs-lisp
+(use-package avy
+  :ensure t
+  :config 
+  (avy-setup-default)
+  :bind ("M-s" . avy-goto-char))
+#+end_src
+* ACTIVE Autocomplete settings
+#+begin_src emacs-lisp
+(use-package auto-complete
+  :ensure t
+  :init
+  (progn
+    (ac-config-default)
+    (global-auto-complete-mode t)
+    ))
+#+end_src
+* ACTIVE Use F5 to reload file into current buffer
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "<f5>") 'revert-buffer)
+#+END_SRC
