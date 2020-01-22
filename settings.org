@@ -8,7 +8,7 @@
      (quote
        (counsel swiper lorem-ipsum tabbar ace-window org-bullets which-key try use-package))))
 #+END_SRC
-* ACTIVE Disabling startup message / menu-bar-mode / tool-bar-mode    
+* ACTIVE Disabling startup message / menu-bar-mode / tool-bar-mode
 #+begin_src emacs-lisp
 (setq inhibit-startup-message t)
 (menu-bar-mode -1)
@@ -46,7 +46,7 @@ Your version of Emacs does not support SSL connections."))
         :config
         (which-key-mode))
 #+end_src
-* ACTIVE Theme settings 
+* ACTIVE Theme settings
 #+begin_src emacs-lisp
 ;; theme settings
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
@@ -62,7 +62,7 @@ Your version of Emacs does not support SSL connections."))
 
 (use-package nyan-mode
     :ensure t
-    :config (nyan-mode +1)) 
+    :config (nyan-mode +1))
 #+end_src
 * ACTIVE Font settings
 #+begin_src emacs-lisp
@@ -184,35 +184,63 @@ Your version of Emacs does not support SSL connections."))
     '(flycheck-python-pylint-executable "python3")
   #+END_SRC
 * ACTIVE Python
+
   #+BEGIN_SRC emacs-lisp
 
-;; Be sure to meet the following requirements:
-;; mkdir -p ~/.emacs.d/.python-environments
-;; virtualenv -p /usr/local/bin/python3 ~/.emacs.d/.python-environments/jedi  
-;; # or whatever your python3 path is
-;; # If you feel like installing the server with 'M-x jedi:install-server', also do the following
-;;
-;; ~/.emacs.d/.python-environments/jedi/bin/pip install --upgrade ~/.emacs.d/elpa/jedi-20150109.2230/  # you might need to change the version number
+    ;; Be sure to meet the following requirements:
+    ;; mkdir -p ~/.emacs.d/.python-environments
+    ;; virtualenv -p /usr/local/bin/python3 ~/.emacs.d/.python-environments/jedi
+    ;; # or whatever your python3 path is
+    ;; # If you feel like installing the server with 'M-x jedi:install-server', also do the following
+    ;;
+    ;; ~/.emacs.d/.python-environments/jedi/bin/pip install --upgrade ~/.emacs.d/elpa/jedi-20150109.2230/  # you might need to change the version number
 
-(add-hook 'python-mode-hook 'jedi:setup)
-(setq jedi:complete-on-dot t)
-(setq jedi:environment-root "jedi")
-  (setq py-python-command "/usr/bin/python3")
-  (use-package jedi
-    :ensure t
-    :init
     (add-hook 'python-mode-hook 'jedi:setup)
-    (add-hook 'python-mode-hook 'jedi:ac-setup))
+    (setq jedi:complete-on-dot t)
+    (setq jedi:environment-root "jedi")
+      (setq py-python-command "/usr/bin/python3")
+      (use-package jedi
+	:ensure t
+	:init
+	(add-hook 'python-mode-hook 'jedi:setup)
+	(add-hook 'python-mode-hook 'jedi:ac-setup))
 
-;; Would need these settings for getting elpy to work
-(setq python-shell-interpreter "python3"
-      python-shell-interpreter-args "-i"
-      elpy-rpc-python-command "python3")
+    ;; Would need these settings for getting elpy to work
+    (setq python-shell-interpreter "python3"
+	  python-shell-interpreter-args "-i"
+	  elpy-rpc-python-command "python3")
 
-(use-package elpy
-  :ensure t
-  :config
-  (elpy-enable))
+    (use-package elpy
+      :ensure t
+      :init
+      (elpy-enable)
+      :config
+      (setq elpy-modules (delq 'highlight-indentation-mode elpy-modules))
+      )
+
+    (use-package yasnippet
+      :ensure t
+      :init
+      (yas-global-mode 1))
+
+    ;; Disable elpy's highlight-indentation-mode and use another one -> highlight-indentation-guides
+    ;; https://github.com/DarthFennec/highlight-indent-guides
+    (add-hook 'python-mode-hook
+	      (setq highlight-indentation-mode -1))
+
+    (use-package highlight-indent-guides
+      :ensure t
+      :init
+      (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+
+    (setq highlight-indent-guides-method 'character)
+    (setq highlight-indent-guides-character ?\|)
+
+    (use-package yasnippet
+      :ensure t
+      :init
+      (yas-global-mode 1))
+  
   #+END_SRC
 * ACTIVE Linum mode
 #+BEGIN_SRC emacs-lisp
@@ -269,3 +297,76 @@ Your version of Emacs does not support SSL connections."))
 
 #+RESULTS:
 : t
+* ACTIVE Notmuch mail settings
+#+begin_src emacs-lisp
+  (use-package popwin
+    :ensure t)
+
+  (autoload 'notmuch "notmuch mail" t)
+
+  ;; setup mail address and username
+  (setq mail-user-agent 'message-user-agent)
+  (setq user-mail-address "Felix1Koch@gmail.com"
+	user-full-name "Felix1Koch")
+
+  ;; smtp config
+  (setq smtpmail-smtp-server "smtp.gmail.com"
+	message-send-mail-function 'message-smtpmail-send-it)
+
+  ;; report problems with smtp server
+  (setq smtpmail-debug-info t)
+  ;; add Cc and Bcc headers to message buffer
+  (setq message-default-mail-headers "Cc: \nBcc: \n")
+
+  ;; offlineimap execution
+
+  (defun notmuch-exec-offlineimap ()
+      "execute offlineimap"
+      (interactive)
+      (set-process-sentinel
+       (start-process-shell-command "offlineimap"
+				    "*offlineimap*"
+				    "offlineimap -o")
+       '(lambda (process event)
+	  (notmuch-refresh-all-buffers)
+	  (let ((w (get-buffer-window "*offlineimap*")))
+	    (when w
+	      (with-selected-window w (recenter (window-end)))))))
+      (popwin:display-buffer "*offlineimap*"))
+
+  (add-to-list 'popwin:special-display-config
+	       '("*offlineimap*" :dedicated t :position bottom :stick t
+		 :height 0.4 :noselect t))
+#+end_src
+* ACTIVE Neotree
+#+begin_src emacs-lisp
+    ;; necessary for changing neotree's style
+  (use-package all-the-icons
+    :ensure t)
+
+  (use-package neotree
+    :ensure t
+    :config
+    (progn
+      (setq neo-theme (if (display-graphic-p) 'arrow))))
+#+end_src
+* ACTIVE Outline settings
+#+begin_src emacs-lisp
+  ;; This Emacs minor-mode creates an automatically updated buffer called *Ilist* that
+  ;; is populated with the current buffer's imenu entries.
+  ;; The *Ilist* buffer is typically shown as a sidebar (Emacs vertically splits the window).
+  (use-package imenu-list
+    :ensure t)
+#+end_src
+
+* ACTIVE Change Highlight Indent Guides' color scheme
+ #+begin_src emacs-lisp
+   (set-face-foreground 'highlight-indent-guides-character-face "white")
+ #+end_src
+* ACTIVE Shell configuration
+#+begin_src emacs-lisp
+  (use-package better-shell
+    :ensure t
+    :bind (("C-'" . better-shell-shell)
+	   ("C-;" . better-shell-remote-open)))
+#+end_src
