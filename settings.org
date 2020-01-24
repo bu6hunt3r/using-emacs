@@ -321,6 +321,28 @@ Your version of Emacs does not support SSL connections."))
   (with-eval-after-load 'org-brain
     (add-hook 'org-brain-after-visualize-hook #'aa2u-org-brain-buffer))
 
+  ;; setting up helm for using helm-org-rifle later on
+  (use-package helm
+    :ensure t)
+
+  (use-package helm-org-rifle
+    :ensure t)
+
+  (defun helm-org-rifle-brain ()
+    "Rifle files in `org-brain-path'."
+    (interactive)
+    (let ((helm-org-rifle-close-unopened-file-buffers nil))
+      (helm-org-rifle-directories (list org-brain-path))))
+
+  (defun helm-org-rifle-open-in-brain (candidate)
+    (-let (((buffer . pos) candidate))
+      (with-current-buffer buffer
+	(goto-char pos)
+	(org-brain-visualize-entry-at-pt))))
+
+  (add-to-list 'helm-org-rifle-actions
+	       (cons "Show entry in org-brain" 'helm-org-rifle-open-in-brain)
+	       t)
 #+end_src
 
 * ACTIVE Org agenda settings
@@ -356,7 +378,7 @@ Your version of Emacs does not support SSL connections."))
   (setq mu4e-maildir (expand-file-name "~/mail/Felix1Koch"))
 
   ;; get mail
-  (setq mu4e-get-mail-command "mbsync -c ~/.emacs.d/.mbsyncrc"
+  (setq mu4e-get-mail-command "mbsync -c ~/.emacs.d/.mbsyncrc -V gmail"
 	mu4e-update-interval 120
 	mu4e-headers-auto-update t)
 
@@ -365,7 +387,9 @@ Your version of Emacs does not support SSL connections."))
   (setq mu4e-reply-to-address "Felix1Koch@gmail.com"
       user-mail-address "Felix1Koch@gmail.com"
       user-full-name  "Felix Koch")
-      
+
+  (setq mu4e-change-filenames-when-moving t)
+
 #+end_src
 * ACTIVE Notmuch mail settings
 #+begin_src emacs-lisp
