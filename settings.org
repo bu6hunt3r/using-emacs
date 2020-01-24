@@ -218,10 +218,6 @@ Your version of Emacs does not support SSL connections."))
       (setq elpy-modules (delq 'highlight-indentation-mode elpy-modules))
       )
 
-    (use-package yasnippet
-      :ensure t
-      :init
-      (yas-global-mode 1))
 
     ;; Disable elpy's highlight-indentation-mode and use another one -> highlight-indentation-guides
     ;; https://github.com/DarthFennec/highlight-indent-guides
@@ -236,12 +232,56 @@ Your version of Emacs does not support SSL connections."))
     (setq highlight-indent-guides-method 'character)
     (setq highlight-indent-guides-character ?\|)
 
+    (setq highlight-indent-guides-auto-enabled nil)
+
+    (set-face-background 'highlight-indent-guides-odd-face "darkgray")
+    (set-face-background 'highlight-indent-guides-even-face "dimgray")
+    (set-face-foreground 'highlight-indent-guides-character-face "dimgray")
+
     (use-package yasnippet
       :ensure t
       :init
       (yas-global-mode 1))
-  
+
   #+END_SRC
+* ACTIVE Ruby
+#+begin_src emacs-lisp
+  (setenv "PATH"
+	  (concat
+	   "/home/cr0c0/.gem/ruby/2.6.0/bin" ":"
+	   (getenv "PATH")))
+
+  (use-package ruby-electric
+    :ensure t
+    :config
+    (progn
+      (add-hook 'ruby-mode-hook 'ruby-electric-mode)))
+
+  (use-package seeing-is-believing
+    :ensure t)
+
+  (setq seeing-is-believing-prefix "C-.")
+  (add-hook 'ruby-mode-hook 'seeing-is-believing)
+  (require 'seeing-is-believing)
+
+  (use-package inf-ruby
+    :ensure t)
+
+  (autoload 'inf-ruby-minor-mode "if-ruby" "Run an inferior Ruby process" t)
+  (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
+#+end_src
+* ACTIVE Yasnippet
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :init
+    (yas-global-mode 1))
+
+  (setq yas-snippet-dirs
+	'("/home/cr0c0/dev/yasnippet-snippets"
+	))
+
+#+end_src
 * ACTIVE Linum mode
 #+BEGIN_SRC emacs-lisp
 (use-package linum
@@ -297,6 +337,36 @@ Your version of Emacs does not support SSL connections."))
 
 #+RESULTS:
 : t
+* ACTIVE mu4e settings
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e/")
+  (require 'smtpmail)
+
+  ;; smtp
+  (setq message-send-mail-function 'smtpmail-send-it
+	smtpmail-starttls-credentials
+	'(("smtp.gmail.com" 587 nil nil))
+	smtpmail-default-smtp-server "smtp.gmail.com"
+	smtpmail-smtp-server "smtp.gmail.com"
+	smtpmail-smtp-service 587
+	smtpmail-debug-info t)
+
+  (require 'mu4e)
+
+  (setq mu4e-maildir (expand-file-name "~/mail/Felix1Koch"))
+
+  ;; get mail
+  (setq mu4e-get-mail-command "mbsync -c ~/.emacs.d/.mbsyncrc"
+	mu4e-update-interval 120
+	mu4e-headers-auto-update t)
+
+  ;; general emacs mail settings; used when composing e-mail
+  ;; the non-mu4e-* stuff is inherited from emacs/message-mode
+  (setq mu4e-reply-to-address "Felix1Koch@gmail.com"
+      user-mail-address "Felix1Koch@gmail.com"
+      user-full-name  "Felix Koch")
+      
+#+end_src
 * ACTIVE Notmuch mail settings
 #+begin_src emacs-lisp
   (use-package popwin
@@ -370,3 +440,17 @@ Your version of Emacs does not support SSL connections."))
     :bind (("C-'" . better-shell-shell)
 	   ("C-;" . better-shell-remote-open)))
 #+end_src
+* ACTIVE Set selective display (code folding shortcut)
+  #+begin_src emacs-lisp
+    (global-set-key (kbd "<f5>") 'set-selective-display-dlw)
+
+    (defun set-selective-display-dlw (&optional level)
+      "Fold text indented same of of more than the cursor.
+    If level is set, set the indent level to LEVEL.
+    if 'selective-display' is already set to LEVEL, clicking
+    F5 again will unset 'selective-display' by setting it to 0."
+      (interactive "P")
+      (if (eq selective-display (1+ (current-column)))
+	  (set-selective-display 0)
+	(set-selective-display (or level (1+ (current-column))))))
+  #+end_src

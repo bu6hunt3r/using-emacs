@@ -406,3 +406,16 @@
 (cheatsheet-add :group 'Crux
                 :key "C-x M-c"
                 :description "crux-capitalize-region")
+(cheatsheet-add :group 'Inf-ruby
+		:key "C-c C-s"
+		:description "launch the inf-ruby process")
+(cheatsheet-add :group 'Inf-ruby
+		:key "C-x o"
+		:description "switch to inf-ruby pane running some random snippets")
+
+(cheatsheet-add :group 'Inf-ruby
+		:key "C-c C-r"
+		:description "push that Ruby code into the IRB")
+(cheatsheet-add :group 'Inf-ruby
+		:key "C-c M-r"
+		:description "run a selected chunk of code  automatically in rb buffer")
