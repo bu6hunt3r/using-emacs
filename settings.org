@@ -130,6 +130,15 @@ Your version of Emacs does not support SSL connections."))
   (setq ivy-use-virtual-buffers t)
   (setq ivy-display-style 'fancy))
 #+end_src
+* ACTIVE Counsel (Better Kill-ring-buffer manipulation)
+#+begin_src emacs-lisp
+  (use-package counsel
+    :ensure t
+    :bind
+    (("M-y" . counsel-yank-pop)
+     :map ivy-minibuffer-map
+     ("M-y" . ivy-next-line)))
+#+end_src
 * ACTIVE Hydra
 #+begin_src emacs-lisp
   (use-package hydra
@@ -327,13 +336,12 @@ Your version of Emacs does not support SSL connections."))
 * ACTIVE Yasnippet
 #+begin_src emacs-lisp
   (use-package yasnippet
-    :ensure t
-    :init
-    (yas-global-mode 1))
+    :ensure t)
 
   (setq yas-snippet-dirs
 	'("/home/cr0c0/dev/yasnippet-snippets"
 	))
+   (yas-global-mode 1)
 
 #+end_src
 * ACTIVE Linum mode
