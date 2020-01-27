@@ -576,3 +576,38 @@ Your version of Emacs does not support SSL connections."))
   ;; how much I like this command. Only copy it if that's what you want.
   (define-key ctl-x-map "n" #'narrow-or-widen-dwim)
 #+end_src
+* ACTIVE r2pipe settings
+#+begin_src emacs-lisp
+  (defun load-if-exists (f)
+    (if (file-readable-p f)
+	(load-file f)))
+
+  (load-if-exists "lisp/r2pipe.el")
+#+end_src
+* ACTIVE ROP chaining
+#+begin_src emacs-lisp
+
+  (defun counsel-rop (arg)
+    "ROP gadget Search for a bianry"
+    (interactive "file name : ")
+    (progn
+      (setq buffer-name (concat (file-name-base arg ) "_gadgets"))
+      (if (get-buffer buffer-name) ()
+	(progn
+      (shell-command (concat "ROPgadget " " --binary " arg) buffer-name)
+      (with-current-buffer buffer-name 
+	(bury-buffer))))
+      (with-current-buffer buffer-name
+	(setq cantidates (split-string (buffer-string) "\n" t))
+	))
+    (ivy-read " Gadget : " cantidates
+	  :re-builder #'ivy--regex-fuzzy
+	  :action #'insert
+	  :caller 'counsel-rop
+	  ))
+  (ivy-set-actions
+   'counsel-rop
+   '(("a" (lambda (x) (insert (car (split-string x "\:")))) "Insert Address")
+     ("r" (lambda (x) (insert (cdr (split-string x "\:")))) "Insert Gadget"))
+   )
+#+end_src
