@@ -419,3 +419,11 @@
 (cheatsheet-add :group 'Inf-ruby
 		:key "C-c M-r"
 		:description "run a selected chunk of code  automatically in rb buffer")
+
+(cheatsheet-add :group 'Iedit
+		:key "C-;"
+		:description "Run iedit mode")
+(cheatsheet-add :group 'Iedit
+		:key "C-x n"
+		:description "Toggle narrowing/widening -> narrow-or-widen-dwim defined
+in settings.org")
