@@ -587,8 +587,9 @@ Your version of Emacs does not support SSL connections."))
 * ACTIVE ROP chaining
 #+begin_src emacs-lisp
 
+
   (defun counsel-rop (arg)
-    "ROP gadget Search for a bianry"
+    "ROP gadget Search for a binary"
     (interactive "file name : ")
     (progn
       (setq buffer-name (concat (file-name-base arg ) "_gadgets"))
@@ -605,9 +606,49 @@ Your version of Emacs does not support SSL connections."))
 	  :action #'insert
 	  :caller 'counsel-rop
 	  ))
+
+
   (ivy-set-actions
    'counsel-rop
    '(("a" (lambda (x) (insert (car (split-string x "\:")))) "Insert Address")
      ("r" (lambda (x) (insert (cdr (split-string x "\:")))) "Insert Gadget"))
    )
+
+  (global-set-key (kbd "C-c r") 'counsel-rop)
+#+end_src
+* ACTIVE Org babel rasm2
+#+begin_src emacs-lisp
+  (require 'ob)
+
+  (defconst org-babel-header-args:rasm2
+    '((:arch . :any)
+      (:bits  . :any)
+      (:disasm . :any)
+      )
+    "Rasm2 specific header arguments.")
+
+
+  (defun org-babel-execute:rasm2 (body params)
+    "Execute a block code with Org Babel.
+  BODY is the source inside the source block and PARAMS is an
+  association list over the source block configurations.  This
+  function is called by `org-babel-execute-src-block'."
+
+    (let* ((arch (cdr (assq :arch params)))
+	   (bits (cdr (assq :bits params))))
+      (if  (assq :disasm params)
+	  (shell-command-to-string
+	   (concat "rasm2 -a  " arch " -b " (number-to-string bits) " -d \"" body "\"" ))
+	(with-temp-buffer
+	  (insert (shell-command-to-string
+		   (concat "rasm2 -C -a " arch " -b " (number-to-string bits) " \"" body "\"" )))
+	  (goto-char (point-min))
+	  (while (re-search-forward "\"" nil t )
+	    (replace-match ""))
+	  (goto-char (point-min))
+	  (while (re-search-forward "\n" nil t )
+	    (replace-match ""))
+	  (buffer-string)
+	  )))
+    )
 #+end_src
