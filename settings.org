@@ -652,3 +652,21 @@ Your version of Emacs does not support SSL connections."))
 	  )))
     )
 #+end_src
+* ACTIVE PDF tools
+#+begin_src emacs-lisp
+  (use-package pdf-tools
+    :ensure t)
+  (use-package org-pdfview
+    :ensure t)
+
+  (require 'pdf-tools)
+  (require 'org-pdfview)
+
+#+end_src
+* ACTIVE x86 Lookup / nasm mode
+#+begin_src emacs-lisp
+  (use-package nasm-mode
+    :ensure t
+    :config
+    (add-hook 'asm-mode-hook 'nasm-mode))
+#+end_src

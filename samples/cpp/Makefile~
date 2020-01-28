@@ -1,0 +1,8 @@
+main: main.o
+	g++ -o main main.o
+
+main.o: main.cpp fact.h
+	g++ -c main.cpp
+
+fact.o: fact.cpp fact.h
+	g++ -c fact.cpp
