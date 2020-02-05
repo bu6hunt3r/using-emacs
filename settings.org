@@ -15,6 +15,10 @@
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 #+end_src
+* ACTIVE Yes-or-no
+#+begin_src emacs-lisp
+  (defalias 'yes-or-no-p 'y-or-n-p)
+#+end_src
 * ACTIVE Adding local files to load path
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/lisp/")
@@ -51,13 +55,12 @@ Your version of Emacs does not support SSL connections."))
 ;; theme settings
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 ;; (load-theme `tron-legacy t)
-;;(use-package nyx-theme
-;;  :ensure t
-;;  :config (load-theme 'nyx t))
-(use-package ujelly-theme
-    :ensure t)
-
-(enable-theme 'ujelly)
+(use-package nyx-theme
+  :ensure t
+  :config (load-theme 'nyx t))
+;;(use-package ujelly-theme
+;;    :ensure t)
+;;(enable-theme 'ujelly)
 (set-background-color "#033f01a90ccc")
 
 (use-package nyan-mode
@@ -76,10 +79,17 @@ Your version of Emacs does not support SSL connections."))
 #+end_src
 * ACTIVE Org-mode stuff
 #+begin_src emacs-lisp
-(use-package org-bullets
-        :ensure t
-        :config 
-        (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+  (use-package org-bullets
+	  :ensure t
+	  :config 
+	  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+  ;; store org mode links to messages
+  (require 'org-mu4e)
+  ;; store link to message if in header view, not to header query
+  (setq org-capture-templates
+	'(("r" "reply-to" entry (file+headline "~/org/brain/todo.org" "Mails to reply to")
+	   "* TODO [#A] %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n%a\n")))
 #+end_src
 * ACTIVE Ido settings
 #+begin_src emacs-lisp
@@ -669,4 +679,34 @@ Your version of Emacs does not support SSL connections."))
     :ensure t
     :config
     (add-hook 'asm-mode-hook 'nasm-mode))
+#+end_src
+* ACTIVE C++ settings
+#+begin_src emacs-lisp
+  (use-package ggtags
+    :ensure t
+    :config
+    (add-hook 'c-mode-common-hook
+	      (lambda ()
+		(when (derived-mode-p 'c-mode 'c++-mode)
+		  (ggtags-mode 1))))
+    )
+
+  (setq imenu-create-index-function #'ggtags-build-imenu-index)
+#+end_src
+* ACTIVE Solidity mode 
+#+begin_src emacs-lisp
+  (use-package solidity-mode
+    :ensure t)
+
+#+end_src
+* ACTIVE Scheme mode
+#+begin_src emacs-lisp
+  (use-package geiser
+    :ensure t
+    :config
+    (setq geiser-active-implementations '(mit)))
+
+  (use-package paredit
+    :ensure t
+    )
 #+end_src
