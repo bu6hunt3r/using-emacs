@@ -25,30 +25,34 @@
 #+END_SRC
 * ACTIVE Initializing package resources
 #+begin_src emacs-lisp
-(require 'package)
-(setq package-enable-at-startup nil)
-(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
-                    (not (gnutls-availaple-p))))
-       (proto (if no-ssl "http" "https")))
-  (when no-ssl
-    (warn "\
-Your version of Emacs does not support SSL connections."))
-  (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t))
-;; (add-to-list 'package-archives
-;;    '("melpa" . "https://melpa.org/packages/"))
-(package-initialize)
+  (require 'package)
+  (setq package-enable-at-startup nil)
+  (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
+		      (not (gnutls-availaple-p))))
+	 (proto (if no-ssl "http" "https")))
+    (when no-ssl
+      (warn "\
+  Your version of Emacs does not support SSL connections."))
+    (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t))
+  ;; (add-to-list 'package-archives
+  ;;    '("melpa" . "https://melpa.org/packages/"))
+  (package-initialize)
 
-;; Bootstrap use-package
-(unless (package-installed-p 'use-package)
-        (package-refresh-contents)
-        (package-install 'use-package))
+  ;; Bootstrap use-package
+  (unless (package-installed-p 'use-package)
+	  (package-refresh-contents)
+	  (package-install 'use-package))
 
-(use-package try
-        :ensure t)
-(use-package which-key
-        :ensure t
-        :config
-        (which-key-mode))
+  (use-package try
+	  :ensure t)
+  (use-package which-key
+	  :ensure t
+	  :config
+	  (which-key-mode)
+	  (which-key-setup-side-window-right)
+	  (which-key-add-major-mode-key-based-replacements 'org-mode
+	    "C-c C-c" "Org C-c C-c"
+	    "C-c C-a" "Org Attach"))
 #+end_src
 * ACTIVE Theme settings
 #+begin_src emacs-lisp
@@ -78,6 +82,9 @@ Your version of Emacs does not support SSL connections."))
 (define-key global-map (kbd "M-0") 'font-size-default)
 #+end_src
 * ACTIVE Org-mode stuff
+  :PROPERTIES:
+  :ORDERED:  t
+  :END:
 #+begin_src emacs-lisp
   (use-package org-bullets
 	  :ensure t
@@ -709,4 +716,21 @@ Your version of Emacs does not support SSL connections."))
   (use-package paredit
     :ensure t
     )
+#+end_src
+* ACTIVE Json / NodeJS editing
+#+begin_src emacs-lisp
+  (use-package json-mode
+    :ensure t)
+
+  (use-package nodejs-repl
+    :ensure t
+    :config
+    (add-hook 'js-mode-hook
+	      (lambda ()
+		(define-key js-mode-map (kbd "C-x C-e") 'nodejs-repl-send-last-expression)
+		(define-key js-mode-map (kbd "C-c C-j") 'nodejs-repl-send-line)
+		(define-key js-mode-map (kbd "C-c C-r") 'nodejs-repl-send-region)
+		(define-key js-mode-map (kbd "C-c C-l") 'nodejs-repl-load-file)
+		(define-key js-mode-map (kbd "C-c C-z") 'nodejs-repl-switch-to-repl)
+		)))
 #+end_src
