@@ -794,3 +794,16 @@
   (add-hook 'erlang-mode-hook 'global-company-mode)
 
 #+end_src
+* DISABLED Elm settings
+#+begin_src emacs-lisp
+  ;; (use-package elm-mode
+  ;;   :ensure t)
+  ;; (use-package flycheck
+  ;;   :ensure t)
+  ;; (use-package flycheck-elm
+  ;;   :ensure t)
+  ;; (use-package company
+  ;;   :ensure t)
+  ;; (use-package elm-oracle
+  ;;   :ensure t)
+#+end_src

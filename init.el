@@ -11,7 +11,7 @@
  '(font-size--default-size default-size)
  '(package-selected-packages
    (quote
-    (undo-tree notmuch rainbow-delimiters mingus cheat org-brain yalinum flycheck htmlize nyan-mode ujelly-theme doom-modeline doom-themes nyx-theme git-gutter counsel swiper lorem-ipsum tabbar ace-window org-bullets which-key try use-package))))
+    (elm-mode undo-tree notmuch rainbow-delimiters mingus cheat org-brain yalinum flycheck htmlize nyan-mode ujelly-theme doom-modeline doom-themes nyx-theme git-gutter counsel swiper lorem-ipsum tabbar ace-window org-bullets which-key try use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
