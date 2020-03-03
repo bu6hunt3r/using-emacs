@@ -65,20 +65,46 @@
 #+end_src
 * ACTIVE Theme settings
 #+begin_src emacs-lisp
-;; theme settings
-;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
-;; (load-theme `tron-legacy t)
-(use-package nyx-theme
-  :ensure t
-  :config (load-theme 'nyx t))
-;;(use-package ujelly-theme
-;;    :ensure t)
-;;(enable-theme 'ujelly)
-(set-background-color "#033f01a90ccc")
-
-(use-package nyan-mode
+  ;; theme settings
+  ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+  ;; (load-theme `tron-legacy t)
+  ;; (use-package nyx-theme
+  ;;  :ensure t
+  ;;  :config (load-theme 'nyx t))
+  ;; (use-package ujelly-theme
+  ;;    :ensure t)
+  ;; (enable-theme 'ujelly)
+  (use-package doom-themes
     :ensure t
-    :config (nyan-mode +1))
+    :config (load-theme 'doom-outrun-electric t))
+
+  (use-package doom-modeline
+    :ensure t
+    :init
+    (doom-modeline-mode))
+
+  (set-background-color "#033f01a90ccc")
+
+  (use-package dashboard
+    :ensure t
+    :config
+    (dashboard-setup-startup-hook))
+
+  (setq dashboard-startup-banner "/home/cr0c0/Bilder/unicorn-resized.png")
+
+  (use-package nyan-mode
+      :ensure t
+      :config (nyan-mode +1))
+
+  ;; (use-package powerline
+  ;;   :ensure t
+  ;;   :config
+  ;;   (powerline-default-theme))
+#+end_src
+* ACTIVE Transpose frames
+#+begin_src emacs-lisp
+  (use-package transpose-frame
+    :ensure t)
 #+end_src
 * ACTIVE Font settings
 #+begin_src emacs-lisp
@@ -156,7 +182,8 @@
   (setq ivy-use-virtual-buffers t)
   (setq ivy-display-style 'fancy))
 #+end_src
-* ACTIVE Counsel (Better Kill-ring-buffer manipulation)
+* ACTIVE Counsel (Better Kill
+-ring-buffer manipulation)
 #+begin_src emacs-lisp
   (use-package counsel
     :ensure t
@@ -547,10 +574,51 @@
  #+end_src
 * ACTIVE Shell configuration
 #+begin_src emacs-lisp
-  (use-package better-shell
+  ;; (use-package better-shell
+  ;;   :ensure t
+  ;;   :bind (("C-'" . better-shell-shell)))
+  ;; 	 ;;("C-;" . better-shell-remote-open)))
+
+  (use-package exec-path-from-shell
     :ensure t
-    :bind (("C-'" . better-shell-shell)))
-	   ;;("C-;" . better-shell-remote-open)))
+    :config
+    (exec-path-from-shell-initialize))
+
+
+      (use-package fish-completion
+      :ensure t
+      :config
+      (global-fish-completion-mode))
+    ;; (use-package eshell-prompt-extras 
+    ;; :ensure t
+    ;; :config
+    ;; (setq epe-show-python-info nil)
+    ;; )
+
+    (use-package eshell-git-prompt
+    :ensure t
+    :config
+    (eshell-git-prompt-use-theme 'git-radar)
+    )
+
+    (require 'cl-lib)
+    (defun select-or-create (arg)
+      "Commentary ARG."
+      (if (string= arg "New eshell")
+	  (eshell t)
+	(switch-to-buffer arg)))
+    (defun eshell-switcher (&optional arg)
+      "Commentary ARG."
+      (interactive)
+      (let* (
+	     (buffers (cl-remove-if-not (lambda (n) (eq (buffer-local-value 'major-mode n) 'eshell-mode)) (buffer-list)) )
+	     (names (mapcar (lambda (n) (buffer-name n)) buffers))
+	     (num-buffers (length buffers) )
+	     (in-eshellp (eq major-mode 'eshell-mode)))
+	(cond ((eq num-buffers 0) (eshell (or arg t)))
+	      ((not in-eshellp) (switch-to-buffer (car buffers)))
+	      (t (select-or-create (completing-read "Select Shell:" (cons "New eshell" names)))))))
+
 #+end_src
 * ACTIVE Set selective display (code folding shortcut)
   #+begin_src emacs-lisp
@@ -708,6 +776,96 @@
     )
 
   (setq imenu-create-index-function #'ggtags-build-imenu-index)
+
+  (use-package irony
+    :ensure t)
+
+  (use-package company-irony
+    :ensure t
+    :config
+    (eval-after-load 'company
+      '(add-to-list 'company-backends 'company-irony)))
+
+  (use-package company-irony-c-headers
+    :ensure t
+    :config
+    (eval-after-load 'company
+      '(add-to-list 'company-backends 'company-irony-c-headers)))
+
+  (setq-local imenu-create-index-function #'ggtags-build-imenu-index)
+
+  (require 'irony)
+  (require 'company-irony)
+  (require 'company-irony-c-headers)
+
+  ;; (setq irony-server-install-prefix "~/local") ; I don't want to run irony out of ~/.emacs.d/irony
+
+  (setq company-async-timeout 30) ; parsing C++ code can take a long time initially
+  (add-hook 'c-mode-common-hook 'irony-mode)
+  (add-hook 'ironymode-hook 'irony-eldoc) ; show documentation for completion candidates
+
+  ;;
+  ;; Replace the `completion-at-point' and `complete-symbol' bindings in
+  ;; irony-mode's buffers by irony-mode's function. This *MAY* make irony
+  ;; compete with and override autocomplete candidates (and cause that menu to
+  ;; close) if this hook is called.
+  ;;
+  (defun my-irony-mode-hook ()
+    (define-key irony-mode-map [remap completion-at-point]
+	'irony-completion-at-point-async)
+    (define-key irony-mode-map [remap complete-symbol]
+	'irony-completion-at-point-async))
+
+  (add-hook 'irony-mode-hook 'my-irony-mode-hook)
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+
+  ;;
+  ;; Setup company-irony
+  ;;
+  (add-hook 'c-mode-common-hook 'company-mode)
+  (eval-after-load 'company
+      '(add-to-list
+	    'company-backends '(company-irony-c-headers company-irony)))
+  ;;
+  ;; Adds CC special commands to `company-begin-commands' in order to
+  ;; trigger completion at interesting places, such as after scope operator
+  ;; std::
+  (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)
+
+  ;;
+  ;; Setup flycheck for irony
+  ;;
+  ;; (add-hook 'c-mode-common-hook 'flycheck-mode)
+  ;; (eval-after-load 'flycheck '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
+  (setq-default flycheck-disabled-checkers '(irony))
+
+  ;; bind TAB to indent or complete
+  (defun irony--check-expansion ()
+    (save-excursion
+      (if (looking-at "\\_>") t
+	(backward-char 1)
+	(if (looking-at "\\.") t
+	  (backward-char 1)
+	  (if (looking-at "->") t nil)))))
+
+  (defun irony--indent-or-complete ()
+    "Indent or Complete"
+    (interactive)
+    (cond ((and (not (use-region-p))
+		(irony--check-expansion))
+	   (message "complete")
+	   (company-complete-common))
+	  (t
+	   (message "indent")
+	   (call-interactively 'c-indent-line-or-region))))
+
+  (defun irony-mode-keys ()
+    "Modify keymaps used by `irony-mode'."
+    (local-set-key (kbd "TAB") 'irony--indent-or-complete)
+    (local-set-key (kbd "<backtab>") 'company-irony-c-headers)
+    )
+  (add-hook 'c-mode-common-hook 'irony-mode-keys)
+
 #+end_src
 * ACTIVE Solidity mode 
 #+begin_src emacs-lisp
@@ -870,4 +1028,88 @@
   ;;   :ensure t)
   ;; (use-package elm-oracle
   ;;   :ensure t)
+#+end_src
+* ACTIVE Haskell settings
+#+begin_src emacs-lisp
+  (add-to-list 'exec-path "/home/cr0c0/.local/bin")
+
+  (use-package haskell-mode
+    :ensure t)
+
+  (use-package eglot
+    :ensure t
+    :config
+    (add-to-list 'eglot-server-programs '(haskell-mode . ("ghcide" "--lsp"))))
+#+end_src
+* ACTIVE Helm Youtube
+#+begin_src emacs-lisp
+  (use-package helm
+    :ensure t)
+
+  (use-package request
+    :ensure t)
+
+  (require 'cl-lib)
+  (require 'helm)
+  (require 'request)
+  (require 'json)
+
+  (defgroup helm-youtube nil
+    "Helm youtube settings."
+    :group 'tools)
+
+  (defcustom helm-youtube-key nil
+    "Your google api key.";; INSERT YOUR KEY FROM GOOGLE ACCOUNT
+    :group 'helm-youtube)
+
+  ;;;###autoload
+  (defun helm-youtube ()
+    (interactive)
+    (unless helm-youtube-key
+      (error "You must set `helm-youtube-key' to use this command"))
+    (request
+      "https://www.googleapis.com/youtube/v3/search"
+      :params `(("part" . "snippet")
+		("q" . ,(read-string "Search YouTube: "))
+		("type" . "video")
+		("maxResults" . "20")
+		("key" . ,helm-youtube-key))
+      :parser 'json-read
+      :success (cl-function
+		(lambda (&key data &allow-other-keys)
+		  (helm-youtube-wrapper data)))
+      :status-code '((400 . (lambda (&rest _) (message "Got 400.")))
+		     (418 . (lambda (&rest _) (message "Got 400."))))
+      :complete (message "searching...")))
+
+  (defun playerctl-playvideo (video-id)
+    (shell-command (concat "playerctl --player=vlc open http://www.youtube.com/watch?v=" video-id)))
+
+  (defun helm-youtube-playvideo (video-id)
+    "Format the youtube URL via VIDEO-ID."
+    ;; (browse-url
+    ;;  (concat "http://www.youtube.com/watch?v=" video-id)))
+    (playerctl-playvideo video-id))
+
+  (defun helm-youtube-tree-assoc (key tree)
+    "Build the tree-assoc from KEY TREE for youtube query."
+    (when (consp tree)
+      (cl-destructuring-bind (x . y)  tree
+	(if (eql x key) tree
+	  (or (helm-youtube-tree-assoc key x) (helm-youtube-tree-assoc key y))))))
+
+  (defun helm-youtube-wrapper (*qqJson*)
+    "Parse the json provided by *QQJSON* and provide search result targets."
+    (let (*results* you-source)
+      (setq *qqJson* (cdr (assoc 'items *qqJson*)))
+      (cl-loop for x being the elements of *qqJson*
+	       do (push (cons (cdr (helm-youtube-tree-assoc 'title x)) (cdr (helm-youtube-tree-assoc 'videoId x))) *results*))
+      (let ((you-source
+	     `((name . "Youtube Search Results")
+	       (candidates . ,(mapcar 'car *results*))
+	       (action . (lambda (candidate)
+			   ;; (message-box "%s" (candidate))
+			   (helm-youtube-playvideo (cdr (assoc candidate *results*)))
+			   )))))
+	(helm :sources '(you-source)))))
 #+end_src

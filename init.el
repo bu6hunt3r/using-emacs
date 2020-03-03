@@ -9,9 +9,10 @@
  '(custom-safe-themes q)
  '(font-size--current-size size)
  '(font-size--default-size default-size)
+ '(helm-youtube-key (quote AIzaSyDfs3niGPbVTgnd7CdinQhWfYo9haClBwQ))
  '(package-selected-packages
    (quote
-    (elm-mode undo-tree notmuch rainbow-delimiters mingus cheat org-brain yalinum flycheck htmlize nyan-mode ujelly-theme doom-modeline doom-themes nyx-theme git-gutter counsel swiper lorem-ipsum tabbar ace-window org-bullets which-key try use-package))))
+    (counsel swiper lorem-ipsum tabbar ace-window org-bullets which-key try use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
