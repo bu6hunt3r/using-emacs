@@ -422,11 +422,15 @@
     :init
     (setq org-brain-path "~/org/brain"))
 
+  (use-package ascii-art-to-unicode
+    :ensure t)
+
   ;; ascii-art-to-unicode settings
   (defface aa2u-face '((t . nil))
     "Face for aa2u box drawing characters")
   (advice-add #'aa2u-1c :filter-return
 	      (lambda (str) (propertize str 'face 'aa2u-face)))
+
   (defun aa2u-org-brain-buffer ()
     (let ((inhibit-read-only t))
       (make-local-variable 'face-remapping-alist)
