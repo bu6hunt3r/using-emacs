@@ -1,3 +1,4 @@
+(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 (require 'org)
 (org-babel-load-file
   (expand-file-name "settings.org" "/home/cr0c0/Dokumente/using-emacs/"))
@@ -13,7 +14,7 @@
  '(helm-youtube-key (quote AIzaSyDfs3niGPbVTgnd7CdinQhWfYo9haClBwQ))
  '(package-selected-packages
    (quote
-    (ascii-art-to-unicode counsel swiper lorem-ipsum tabbar ace-window org-bullets which-key try use-package))))
+    (undo-tree counsel swiper lorem-ipsum tabbar ace-window org-bullets which-key try use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
