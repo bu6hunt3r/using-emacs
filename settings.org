@@ -83,7 +83,7 @@
     :init
     (doom-modeline-mode))
 
-  (set-background-color "#033f01a90ccc")
+  ;; (set-background-color "#033f01a90ccc")
 
   (use-package dashboard
     :ensure t
