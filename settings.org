@@ -90,7 +90,7 @@
     :config
     (dashboard-setup-startup-hook))
 
-  (setq dashboard-startup-banner "/home/cr0c0/Bilder/unicorn-resized.png")
+  (setq dashboard-startup-banner "/home/cr0c0/Dokumente/using-emacs/unicorn-resized.png")
 
   (use-package nyan-mode
       :ensure t
