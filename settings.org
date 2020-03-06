@@ -322,7 +322,7 @@
 	(add-hook 'python-mode-hook 'jedi:ac-setup))
 
     ;; Would need these settings for getting elpy to work
-    (setq python-shell-interpreter "python3"
+    (setq python-shell-interpreter "ipython"
 	  python-shell-interpreter-args "-i"
 	  elpy-rpc-python-command "python3")
 
@@ -358,6 +358,18 @@
       :ensure t
       :init
       (yas-global-mode 1))
+
+    (defun my-merge-imenu ()
+      (interactive)
+      (let ((mode-imenu (imenu-default-create-index-function))
+	    (custom-imenu (imenu--generic-function imenu-generic-expression)))
+	    (append mode-imenu custom-imenu)))
+
+    (setq imenu-create-index-function 'my-merge-imenu)
+    (define-key python-mode-map (kbd "M-.") 'jedi:goto-definition)
+    (define-key python-mode-map (kbd "M-,") 'jedi:goto-definition-pop-marker)
+    (define-key python-mode-map (kbd "M-/") 'jedi:show-doc)
+    (define-key python-mode-map (kbd "M-?") 'jedi:show-related-names)
 
   #+END_SRC
 * ACTIVE Ruby
