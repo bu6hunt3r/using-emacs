@@ -15,6 +15,16 @@
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 #+end_src
+* ACTIVE Backup files / Auto saves
+#+begin_src emacs-lisp
+;; backup in one place. flat, no tree structure
+(setq backup-directory-alist '((""."~/.emacs.d/backup")))
+
+;; stop creating those #auto-save# files
+(setq auto-save-default nil)
+
+(setq create-lockfiles nil)
+#+end_src
 * ACTIVE Yes-or-no
 #+begin_src emacs-lisp
   (defalias 'yes-or-no-p 'y-or-n-p)
@@ -893,6 +903,28 @@
     (local-set-key (kbd "<backtab>") 'company-irony-c-headers)
     )
   (add-hook 'c-mode-common-hook 'irony-mode-keys)
+
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+
+  ;; I use irony with flycheck to get real-time syntax checking.
+  (use-package flycheck-irony
+    :ensure t
+    :config
+      (progn
+	(eval-after-load 'flycheck '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))))
+
+  ;; Eldoc shows argument list of the function you are currently writing in the echo area.
+  (use-package irony-eldoc
+    :ensure t
+    :config
+    (progn
+      (add-hook 'irony-mode-hook #'irony-eldoc)))
+
+  (defun company-complete-key ()
+    "Set company-complete key for c/cpp mode."
+    (local-set-key (kbd "M-RET") 'company-complete))
+
+  (add-hook 'irony-mode-hook #'company-complete-key)
 
 #+end_src
 * ACTIVE Solidity mode 
