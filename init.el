@@ -9,12 +9,17 @@
  ;; If there is more than one, they won't work right.
  '(crux-shell "/bin/bash")
  '(custom-safe-themes q)
+ '(elpy-modules
+   (quote
+    (elpy-module-company elpy-module-flymake elpy-module-pyvenv elpy-module-highlight-indentation elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults)))
+ '(flycheck-checker-error-threshold 1000)
  '(font-size--current-size size)
  '(font-size--default-size default-size)
  '(helm-youtube-key (quote AIzaSyDfs3niGPbVTgnd7CdinQhWfYo9haClBwQ))
+ '(nand2tetris-tools-dir (quote /home/cr0c0/nand2tetris/tools))
  '(package-selected-packages
    (quote
-    (undo-tree counsel swiper lorem-ipsum tabbar ace-window org-bullets which-key try use-package))))
+    (undo-fu nand2tetris irony-eldoc undo-tree counsel swiper lorem-ipsum tabbar ace-window org-bullets which-key try use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

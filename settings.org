@@ -154,6 +154,48 @@
   (setq org-capture-templates
 	'(("r" "reply-to" entry (file+headline "~/org/brain/todo.org" "Mails to reply to")
 	   "* TODO [#A] %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n%a\n")))
+
+  ;; (defun org-read-entry-property-name ()
+  ;;   "Read a property name from the current entry."
+  ;;   (let ((completion-ignore-case t)
+  ;; 	(default-prop (or (and (org-at-property-p)
+  ;; 			       (org-match-string-no-properties 2))
+  ;; 			  org-last-set-property)))
+  ;;     (org-completing-read
+  ;;      (format "Property [%s]: " (if default-prop default-prop ""))
+  ;;      (org-entry-properties nil nil)
+  ;;      nil nil nil nil default-prop)))
+  ;; 
+  ;; (defun my-org-region-to-property (&optional property)
+  ;;   "Copies the region as value to an Org-mode property"
+  ;;   (interactive)
+  ;;   ;; if no region is defined, do nothing
+  ;;   (if (use-region-p)
+  ;;       ;; if a region string is found, ask for a property and set property to
+  ;;       ;; the string in the region
+  ;;       (let ((val (replace-regexp-in-string
+  ;; 		  "\\`[ \t\n]*" ""
+  ;; 		  (replace-regexp-in-string "[ \t\n]*\\'" ""
+  ;; 					    (substring (buffer-string)
+  ;; 						       (- (region-beginning) 1)
+  ;; 						       (region-end))))
+  ;; 		 )
+  ;; 	    ;; if none was stated by user, read property from user
+  ;; 	    (prop (or property
+  ;; 		      (org-read-entry-property-name))))
+  ;; 	;; set property
+  ;; 	(org-set-property prop val))))
+  ;; 
+  ;; (use-package yankpad
+  ;;   :ensure t
+  ;;   :defer 10
+  ;;   :init
+  ;;   (setq yankpad-file "~/org/brain/yankpad.org")
+  ;;   :config
+  ;;   (bind-key "<f7>" 'yankpad-map)
+  ;;   (bind-key "<f12>" 'yankpad-expand)
+  ;;   ;; If you want to complete snippets using company-mode
+  ;;   (add-to-list 'company-backends #'company-yankpad))
 #+end_src
 * ACTIVE Ido settings
 #+begin_src emacs-lisp
@@ -444,10 +486,10 @@
 #+END_SRC
 * ACTIVE Undo Tree
   #+begin_src emacs-lisp
-    (use-package undo-tree
-      :ensure t
-      :init
-      (global-undo-tree-mode t))
+    ;; (use-package undo-tree
+    ;;   :ensure t
+    ;;   :init
+    ;;   (global-undo-tree-mode t))
   #+end_src
 * ACTIVE Org brain settings
 #+begin_src emacs-lisp
@@ -926,6 +968,54 @@
 
   (add-hook 'irony-mode-hook #'company-complete-key)
 
+  ;; Use compilation database first, clang_complete as fallback
+  (setq-default irony-cdb-completion-databases '(irony-cdb-libclang
+						 irony-cdb-clang-complete))
+
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+
+  (use-package rtags
+    :ensure t
+    :config
+    (progn
+      (unless (rtags-executable-find "rc") (error "Binary rc is not installed!"))
+      (unless (rtags-executable-find "rdm") (error "Binary rdm is not installed!"))
+
+      (define-key c-mode-base-map (kbd "M-.") 'rtags-find-symbol-at-point)
+      (define-key c-mode-base-map (kbd "M-,") 'rtags-find-references-at-point)
+      (define-key c-mode-base-map (kbd "M-?") 'rtags-display-summary)
+      (rtags-enable-standard-keybindings)
+      ;; Shutdown rdm when leaving emacs.
+      (add-hook 'kill-emacs-hook 'rtags-quit-rdm)))
+
+  ;; Use rtags for auto-completion.
+  (use-package company-rtags
+    :ensure t
+    :config
+    (progn
+      (setq rtags-autostart-diagnostics t)
+      (rtags-diagnostics)
+      (setq rtags-completions-enabled t)
+      (push 'company-rtags company-backends)
+      ))
+
+  ;; Live code checking.
+  (use-package flycheck-rtags
+    :ensure t
+    :config
+    (progn
+      ;; ensure that we use only rtags checking
+      ;; https://github.com/Andersbakken/rtags#optional-1
+      (defun setup-flycheck-rtags ()
+	(flycheck-select-checker 'rtags)
+	(setq-local flycheck-highlighting-mode nil) ;; RTags creates more accurate overlays.
+	(setq-local flycheck-check-syntax-automatically nil)
+	(rtags-set-periodic-reparse-timeout 2.0)  ;; Run flycheck 2 seconds after being idle.
+	)
+      (add-hook 'c-mode-hook #'setup-flycheck-rtags)
+      (add-hook 'c++-mode-hook #'setup-flycheck-rtags)
+      ))
+  
 #+end_src
 * ACTIVE Solidity mode 
 #+begin_src emacs-lisp
@@ -963,58 +1053,58 @@
 #+end_src
 * ACTIVE Erlang settings
 #+begin_src emacs-lisp
-  (use-package erlang
-    :ensure t)
-
-  (use-package popup
-    :ensure t)
-
-  (use-package company
-    :ensure t)
-
-  (use-package flycheck-tip
-    :ensure t)
-
-  (setq load-path (cons "/usr/lib/erlang/lib/tools-3.3/emacs"
-			load-path))
-
-  (require 'erlang-start)
-  (setq erlang-root-dir "/usr/lib/erlang/")
-  (setq exec-path (cons "/usr/lib/erlang/bin" exec-path))
-  (setq erlang-man-root-dir "/usr/lib/erlang/man")
-
-  ;; flycheck settings
-  (require 'flycheck)
-  (flycheck-define-checker erlang-otp
-    "An Erlang syntax checker using the Erlang interpreter."
-    :command ("erlc" "-o" temporary-directory "-Wall"
-	      "-I" "../include" "-I" "../../include"
-	      "-I" "../../../include" source)
-    :error-patterns
-    ((warning line-start (file-name) ":" line ": Warning:" (message) line-end)
-     (error line-start (file-name) ":" line ": " (message) line-end))
-    :modes  erlang-mode)
-
-  (add-hook 'erlang-mode-hook
-	    (lambda ()
-	      (flycheck-select-checker 'erlang-otp)
-	      (flycheck-mode)))
-
-  ;; setting up distel
-  (push "~/.emacs.d/distel/elisp/" load-path)
-  (require 'distel)
-  (distel-setup)
-
-  ;; setting up company-distel
-  (push "~/.emacs.d/company-distel/" load-path)
-  (require 'company-distel)
-  (add-to-list 'company-backends 'company-distel)
-
-  ;; enable company just for erlang
-  (add-hook 'erlang-mode-hook 'global-company-mode)
-
-  ;; flycheck-tip settings
-  (require 'flycheck-tip)
+  ;; (use-package erlang
+  ;;   :ensure t)
+  ;; 
+  ;; (use-package popup
+  ;;   :ensure t)
+  ;; 
+  ;; (use-package company
+  ;;   :ensure t)
+  ;; 
+  ;; (use-package flycheck-tip
+  ;;   :ensure t)
+  ;; 
+  ;; (setq load-path (cons "/usr/lib/erlang/lib/tools-3.3/emacs"
+  ;; 		      load-path))
+  ;; 
+  ;; (require 'erlang-start)
+  ;; (setq erlang-root-dir "/usr/lib/erlang/")
+  ;; (setq exec-path (cons "/usr/lib/erlang/bin" exec-path))
+  ;; (setq erlang-man-root-dir "/usr/lib/erlang/man")
+  ;; 
+  ;; ;; flycheck settings
+  ;; (require 'flycheck)
+  ;; (flycheck-define-checker erlang-otp
+  ;;   "An Erlang syntax checker using the Erlang interpreter."
+  ;;   :command ("erlc" "-o" temporary-directory "-Wall"
+  ;; 	    "-I" "../include" "-I" "../../include"
+  ;; 	    "-I" "../../../include" source)
+  ;;   :error-patterns
+  ;;   ((warning line-start (file-name) ":" line ": Warning:" (message) line-end)
+  ;;    (error line-start (file-name) ":" line ": " (message) line-end))
+  ;;   :modes  erlang-mode)
+  ;; 
+  ;; (add-hook 'erlang-mode-hook
+  ;; 	  (lambda ()
+  ;; 	    (flycheck-select-checker 'erlang-otp)
+  ;; 	    (flycheck-mode)))
+  ;; 
+  ;; ;; setting up distel
+  ;; (push "~/.emacs.d/distel/elisp/" load-path)
+  ;; (require 'distel)
+  ;; (distel-setup)
+  ;; 
+  ;; ;; setting up company-distel
+  ;; (push "~/.emacs.d/company-distel/" load-path)
+  ;; (require 'company-distel)
+  ;; (add-to-list 'company-backends 'company-distel)
+  ;; 
+  ;; ;; enable company just for erlang
+  ;; (add-hook 'erlang-mode-hook 'global-company-mode)
+  ;; 
+  ;; ;; flycheck-tip settings
+  ;; (require 'flycheck-tip)
 #+end_src
 * DISABLED Elm settings
 #+begin_src emacs-lisp
@@ -1031,15 +1121,33 @@
 #+end_src
 * ACTIVE Haskell settings
 #+begin_src emacs-lisp
-  (add-to-list 'exec-path "/home/cr0c0/.local/bin")
-
-  (use-package haskell-mode
+  ;; LSP
+  (use-package flycheck
+    :ensure t
+    :init
+    (global-flycheck-mode t))
+  (use-package yasnippet
     :ensure t)
+  (use-package lsp-mode
+    :ensure t
+    :hook (haskell-mode . lsp)
+    :commands lsp)
+  (use-package lsp-ui
+    :ensure t
+    :commands lsp-ui-mode)
+  (use-package lsp-haskell
+   :ensure t
+   :config
+   (setq lsp-haskell-process-path-hie "/home/cr0c0/.cabal/bin/ghcide")
+   (setq lsp-haskell-process-args-hie '())
+   ;; Comment/uncomment this line to see interactions between lsp client/server.
+   ;;(setq lsp-log-io t)
+   )
 
   (use-package eglot
     :ensure t
     :config
-    (add-to-list 'eglot-server-programs '(haskell-mode . ("ghcide" "--lsp"))))
+    (add-to-list 'eglot-server-programs '(haskell-mode . ("/home/cr0c0/.cabal/bin/ghcide" "--lsp"))))
 #+end_src
 * ACTIVE Helm Youtube
 #+begin_src emacs-lisp
@@ -1112,4 +1220,123 @@
 			   (helm-youtube-playvideo (cdr (assoc candidate *results*)))
 			   )))))
 	(helm :sources '(you-source)))))
+#+end_src
+* ACTIVE Yasnippet / Yankpad
+#+begin_src emacs-lisp
+  ;; Yet another snippet extension program
+  (use-package yasnippet
+    :diminish yas-minor-mode
+    :config
+      (yas-global-mode 1)
+      ;; respect the spacing in my snippet declarations
+      (setq yas-indent-line 'fixed)
+  )
+
+  ;; Nice “interface” to said program
+  (use-package yankpad
+    ;; :if company-mode ;; load & initialise only if company-mode is defined
+    :demand t
+    :init
+      ;; Location of templates
+      (setq yankpad-file "~/.emacs.d/yankpad.org")
+      (setq yankpad-category "Category: Default")
+    :config
+      ;; If you want to complete snippets using company-mode
+      ;; (add-to-list 'company-backends #'company-yankpad)
+      ;; If you want to expand snippets with hippie-expand
+      ;; (add-to-list 'hippie-expand-try-functions-list #'yankpad-expand)
+      ;; Load the snippet templates -- useful after yankpad is altered
+      (add-hook 'after-init-hook 'yankpad-reload)
+  )
+
+  ;; Elementary textual completion backend.
+  ;; (setq company-backends
+  ;;   (add-to-list 'company-backends 'company-dabbrev))
+  ;;
+  ;; Add yasnippet support for all company backends
+  ;; https://emacs.stackexchange.com/a/10520/10352
+  ;;
+  ;; (defvar company-mode/enable-yas t
+  ;;  "There can only be one main completition backend, so let's
+  ;;   enable yasnippet/yankpad as a secondary for all completion backends.")
+
+  ;; (defun company-mode/backend-with-yas (backend)
+  ;;  (if (or (not company-mode/enable-yas)
+  ;;	  (and (listp backend) (member 'company-yankpad backend)))
+  ;;      backend
+  ;;    (append (if (consp backend) backend (list backend))
+  ;;	    '(:with company-yankpad))))
+
+  ;; (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+#+end_src
+* ACTIVE LaTeX Beamer
+#+begin_src emacs-lisp
+  (setq org-export-latex-listings t)
+
+  ;; Originally taken from Bruno Tavernier: http://thread.gmane.org/gmane.emacs.orgmode/31150/focus=31432
+  ;; but adapted to use latexmk 4.20 or higher.
+  (defun my-auto-tex-cmd ()
+    "When exporting from .org with latex, automatically run latex,
+       pdflatex, or xelatex as appropriate, using latexmk."
+    (let ((texcmd)))
+    ;; default command: oldstyle latex via dvi
+    (setq texcmd "latexmk -dvi -pdfps -quiet %f")
+    ;; pdflatex -> .pdf
+    (if (string-match "LATEX_CMD: pdflatex" (buffer-string))
+	(setq texcmd "latexmk -pdf -quiet %f"))
+    ;; xelatex -> .pdf
+    (if (string-match "LATEX_CMD: xelatex" (buffer-string))
+	(setq texcmd "/home/rincewind/bin/latexmk.pl -pdflatex=xelatex -pdf -quiet %f"))
+    ;; LaTeX compilation command
+    (setq org-latex-to-pdf-process (list texcmd)))
+
+  (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-cmd)
+
+
+  ;; Specify default packages to be included in every tex file, whether pdflatex or xelatex
+  (setq org-export-latex-packages-alist
+	'(("" "graphicx" t)
+	      ("" "longtable" nil)
+	      ("" "float" nil)))
+
+  (defun my-auto-tex-parameters ()
+	"Automatically select the tex packages to include."
+	;; default packages for ordinary latex or pdflatex export
+	(setq org-export-latex-default-packages-alist
+	      '(("AUTO" "inputenc" t)
+		("T1"   "fontenc"   t)
+		(""     "fixltx2e"  nil)
+		(""     "wrapfig"   nil)
+		(""     "soul"      t)
+		(""     "textcomp"  t)
+		(""     "marvosym"  t)
+		(""     "wasysym"   t)
+		(""     "latexsym"  t)
+		(""     "amssymb"   t)
+		(""     "hyperref"  nil)))
+
+	;; Packages to include when xelatex is used
+	(if (string-match "LATEX_CMD: xelatex" (buffer-string))
+	    (setq org-export-latex-default-packages-alist
+		  '(("" "fontspec" t)
+		    ("" "xunicode" t)
+		    ("" "url" t)
+		    ("" "rotating" t)
+		    ("" "polyglossia" t) ;; statt babel
+		    ("" "soul" t)
+		    ("xetex" "hyperref" nil)
+		    )))
+
+	(if (string-match "LATEX_CMD: xelatex" (buffer-string))
+	    (setq org-export-latex-classes
+		  (cons '("article"
+			  "\\documentclass[11pt,article,oneside]{memoir}"
+			  ("\\section{%s}" . "\\section*{%s}")
+			  ("\\subsection{%s}" . "\\subsection*{%s}")
+			  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+			  ("\\paragraph{%s}" . "\\paragraph*{%s}")
+			  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+			org-export-latex-classes))))
+
+  (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
 #+end_src
