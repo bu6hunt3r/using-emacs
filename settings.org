@@ -544,6 +544,32 @@
 #+begin_src emacs-lisp
   (setq org-agenda-files (list "~/org/brain/todo.org"))
 #+end_src
+* ACTIVE Internal Org mode links 
+#+begin_src emacs-lisp
+  ;; use ivy to insert a link to a heading in the current document
+  ;; based on `worf-goto`
+  (defun my/worf-insert-internal-link ()
+    "Use ivy to insert a link to aheading in the current `org-mode'
+  document. Code is based on `worf-goto'."
+    (interactive)
+    (let ((cands (worf--goto-candidates)))
+      (ivy-read "Heading: " cands
+		:action 'bjm/worf-insert-internal-link-action)))
+
+  (defun my/worf-insert-internal-link-action (x)
+    "Insert link for `bjm/worf-insert-internal-link'"
+    ;; goto heading
+    (save-excursion
+      (goto-char (cdr x))
+      ;; store link
+      (call-interactively 'org-store-link)
+      )
+    ;; return to original point and insert link
+    (org-insert-last-stored-link 1)
+    ;; org-insert-last-stored-link adds a newline, so
+    ;; delete this
+    (delete-backward-char 1))
+#+end_src
 * ACTIVE Load cheatsheets
 #+begin_src emacs-lisp
   (use-package cheatsheet
