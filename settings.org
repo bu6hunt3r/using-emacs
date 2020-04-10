@@ -1366,3 +1366,41 @@
 
   (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
 #+end_src
+* ACTIVE Symon
+#+begin_src emacs-lisp
+;; System monitor in bar
+(use-package symon
+  :defer 3
+  :ensure t
+  :config
+  (setq symon-sparkline-type 'bounded)
+  (define-symon-monitor symon-current-date-time-monitor
+    :interval 5
+    :display (propertize
+	      (format-time-string "%k:%M %a %d %b %Y ")
+	      'face 'font-lock-type-face))
+  (setq symon-monitors
+	(cond ((memq system-type '(gnu/linux cygwin))
+	       '(symon-current-date-time-monitor
+		 symon-linux-memory-monitor
+		 symon-linux-cpu-monitor
+		 symon-linux-network-rx-monitor
+		 symon-linux-network-tx-monitor
+		 symon-linux-battery-monitor))
+	      ((memq system-type '(darwin))
+	       '(symon-current-date-time-monitor
+		 symon-darwin-memory-monitor
+		 symon-darwin-cpu-monitor
+		 symon-darwin-network-rx-monitor
+		 symon-darwin-network-tx-monitor
+		 symon-darwin-battery-monitor))
+	      ((memq system-type '(windows-nt))
+	       '(symon-current-date-time-monitor
+		 symon-windows-memory-monitor
+		 symon-windows-cpu-monitor
+		 symon-windows-network-rx-monitor
+		 symon-windows-network-tx-monitor
+		 symon-windows-battery-monitor))))
+  (symon-mode)
+  )
+#+end_src
