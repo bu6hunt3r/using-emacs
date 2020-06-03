@@ -56,24 +56,24 @@
   (use-package try
 	  :ensure t)
 
-  ;; (use-package which-key
-  ;; 	:ensure t
-  ;; 	:config
-  ;; 	(which-key-mode)
-  ;; 	(which-key-setup-side-window-right)
-  ;; 	(which-key-add-major-mode-key-based-replacements 'org-mode
-  ;; 	  "C-c C-c" "Org C-c C-c"
-  ;; 	  "C-c C-a" "Org Attach"))
+  (use-package which-key
+	  :ensure t
+	  :config
+	  (which-key-mode)
+	  (which-key-setup-side-window-right)
+	  (which-key-add-major-mode-key-based-replacements 'org-mode
+	    "C-c C-c" "Org C-c C-c"
+	    "C-c C-a" "Org Attach"))
 
-  (use-package guide-key
-    :ensure t
-    :init
-    (setq guide-key/guide-key-sequence '("C-x"))
-    (setq guide-key/guide-key-sequence '("C-x r" "C-x 4" "C-x v" "C-x 8" "C-x +"))
-    (setq guide-key/recursive-key-sequence-flag t)
-    (setq guide-key/popup-window-position 'bottom)
-    (guide-key-mode 1))
-  
+  ;; (use-package guide-key
+  ;;   :ensure t
+  ;;   :init
+  ;;   (setq guide-key/guide-key-sequence '("C-x"))
+  ;;   (setq guide-key/guide-key-sequence '("C-x r" "C-x 4" "C-x v" "C-x 8" "C-x +"))
+  ;;   (setq guide-key/recursive-key-sequence-flag t)
+  ;;   (setq guide-key/popup-window-position 'bottom)
+  ;;   (guide-key-mode 1))
+
 
 #+end_src
 * ACTIVE Automatically upgrading packages
@@ -263,15 +263,15 @@
 #+end_src
 * ACTIVE Git settings
 #+begin_src emacs-lisp
-  (use-package magit
-    :ensure t
-    :init
-    (progn
-      (bind-key "C-x g" 'magit-status)
-      ))
+(use-package magit
+  :ensure t
+  :init
+  (progn
+    (bind-key "C-x g" 'magit-status)
+    ))
 
-  (setq magit-status-margin
-    '(t "%Y-%m-%d %H:%M " magit-log-margin-width t 18))
+(setq magit-status-margin
+  '(t "%Y-%m-%d %H:%M " magit-log-margin-width t 18))
 
   (use-package git-gutter
     :ensure t
@@ -315,7 +315,7 @@
   ;;         :ensure t
   ;;         :config
   ;;         (global-git-gutter-mode +1))
- 
+
 #+end_src
 * ACTIVE Avy settings
 #+begin_src emacs-lisp
@@ -852,17 +852,17 @@
 	  )))
     )
 #+end_src
-* ACTIVE PDF tools
+* DISABLED PDF tools
 #+begin_src emacs-lisp
-  (use-package pdf-tools
-    :ensure t)
-  (use-package org-pdfview
-    :ensure t)
-
-  (require 'pdf-tools)
-  (require 'org-pdfview)
-
+  ;; (use-package pdf-tools
+  ;;   :ensure t)
+  ;; (use-package org-pdfview
+  ;;   :ensure t)
+  ;; 
+  ;; (require 'pdf-tools)
+  ;; (require 'org-pdfview)
 #+end_src
+* 
 * ACTIVE x86 Lookup / nasm mode
 #+begin_src emacs-lisp
   (use-package nasm-mode
@@ -872,176 +872,99 @@
 #+end_src
 * ACTIVE C++ settings
 #+begin_src emacs-lisp
-  (use-package ggtags
-    :ensure t
-    :config
-    (add-hook 'c-mode-common-hook
-	      (lambda ()
-		(when (derived-mode-p 'c-mode 'c++-mode)
-		  (ggtags-mode 1))))
-    )
-
-  (setq imenu-create-index-function #'ggtags-build-imenu-index)
-
-  (use-package irony
+  (use-package cmake-ide
     :ensure t)
 
   (use-package company-irony
-    :ensure t
-    :config
-    (eval-after-load 'company
-      '(add-to-list 'company-backends 'company-irony)))
+    :ensure t)
 
   (use-package company-irony-c-headers
-    :ensure t
-    :config
-    (eval-after-load 'company
-      '(add-to-list 'company-backends 'company-irony-c-headers)))
+    :ensure t)
 
-  (setq-local imenu-create-index-function #'ggtags-build-imenu-index)
-
-  (require 'irony)
-  (require 'company-irony)
-  (require 'company-irony-c-headers)
-
-  ;; (setq irony-server-install-prefix "~/local") ; I don't want to run irony out of ~/.emacs.d/irony
-
-  (setq company-async-timeout 30) ; parsing C++ code can take a long time initially
-  (add-hook 'c-mode-common-hook 'irony-mode)
-  (add-hook 'ironymode-hook 'irony-eldoc) ; show documentation for completion candidates
-
-  ;;
-  ;; Replace the `completion-at-point' and `complete-symbol' bindings in
-  ;; irony-mode's buffers by irony-mode's function. This *MAY* make irony
-  ;; compete with and override autocomplete candidates (and cause that menu to
-  ;; close) if this hook is called.
-  ;;
-  (defun my-irony-mode-hook ()
-    (define-key irony-mode-map [remap completion-at-point]
-	'irony-completion-at-point-async)
-    (define-key irony-mode-map [remap complete-symbol]
-	'irony-completion-at-point-async))
-
-  (add-hook 'irony-mode-hook 'my-irony-mode-hook)
-  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-
-  ;;
-  ;; Setup company-irony
-  ;;
-  (add-hook 'c-mode-common-hook 'company-mode)
-  (eval-after-load 'company
-      '(add-to-list
-	    'company-backends '(company-irony-c-headers company-irony)))
-  ;;
-  ;; Adds CC special commands to `company-begin-commands' in order to
-  ;; trigger completion at interesting places, such as after scope operator
-  ;; std::
-  (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)
-
-  ;;
-  ;; Setup flycheck for irony
-  ;;
-  ;; (add-hook 'c-mode-common-hook 'flycheck-mode)
-  ;; (eval-after-load 'flycheck '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
-  (setq-default flycheck-disabled-checkers '(irony))
-
-  ;; bind TAB to indent or complete
-  (defun irony--check-expansion ()
-    (save-excursion
-      (if (looking-at "\\_>") t
-	(backward-char 1)
-	(if (looking-at "\\.") t
-	  (backward-char 1)
-	  (if (looking-at "->") t nil)))))
-
-  (defun irony--indent-or-complete ()
-    "Indent or Complete"
-    (interactive)
-    (cond ((and (not (use-region-p))
-		(irony--check-expansion))
-	   (message "complete")
-	   (company-complete-common))
-	  (t
-	   (message "indent")
-	   (call-interactively 'c-indent-line-or-region))))
-
-  (defun irony-mode-keys ()
-    "Modify keymaps used by `irony-mode'."
-    (local-set-key (kbd "TAB") 'irony--indent-or-complete)
-    (local-set-key (kbd "<backtab>") 'company-irony-c-headers)
-    )
-  (add-hook 'c-mode-common-hook 'irony-mode-keys)
-
-  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-
-  ;; I use irony with flycheck to get real-time syntax checking.
   (use-package flycheck-irony
-    :ensure t
-    :config
-      (progn
-	(eval-after-load 'flycheck '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))))
+    :ensure t)
 
-  ;; Eldoc shows argument list of the function you are currently writing in the echo area.
-  (use-package irony-eldoc
-    :ensure t
-    :config
-    (progn
-      (add-hook 'irony-mode-hook #'irony-eldoc)))
+  (defun my/local-set-keys (key-commands)
+    "Set multiple local keabindings with KEY-COMMANDS list."
+    (let ((local-map (current-local-map)))
+      (dolist (kc key-commands)
+	(define-key local-map
+	  (kbd (car kc))
+	  (cdr kc)))))
 
-  (defun company-complete-key ()
-    "Set company-complete key for c/cpp mode."
-    (local-set-key (kbd "M-RET") 'company-complete))
+  (defun my/flycheck ()
+    "Configurate flycheck."
+    (add-to-list 'display-buffer-alist
+		 `(,(rx bos "*Flycheck errors*" eos)
+		   (display-buffer-reuse-window
+		    display-buffer-in-side-window)
+		   (side            . bottom)
+		   (reusable-frames . visible)
+		   (window-height   . 0.23)))
+    (setq flycheck-display-errors-function
+	  #'flycheck-display-error-messages-unless-error-list))
 
-  (add-hook 'irony-mode-hook #'company-complete-key)
+  (defun my/irony ()
+    "Irony mode configuration."
+    (add-hook 'irony-mode-hook 'irony-eldoc)
+    (add-to-list 'company-backends 'company-irony)
+    (add-to-list 'company-backends 'company-irony-c-headers)
+    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+    (add-hook 'flycheck-mode-hook 'flycheck-irony-setup)
+    (when (or (eq major-mode 'c-mode)	; Prevent from being loaded by c derived mode
+	      (eq major-mode 'c++-mode))
+      (irony-mode 1)))
 
-  ;; Use compilation database first, clang_complete as fallback
-  (setq-default irony-cdb-completion-databases '(irony-cdb-libclang
-						 irony-cdb-clang-complete))
+  (defun my/cc-base ()
+    "Common configuration for c and c++ mode."
+    ;; Company mode
+    (setf company-backends '())
+    (add-to-list 'company-backends 'company-keywords)
+    (my/irony))
 
-  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+  ;; add it to c++-mode-hook
+  (add-hook 'c++-mode-hook 'my/cc-base)
+
+  (add-hook 'c++-mode-hook '(lambda()
+			      (cmake-ide-setup)
+			      (my/local-set-keys
+			       `("C-c C-a" . cmake-ide-compile)
+			       )))
+
+  ;; generate informations about current project .dir-locals.el
+  ;; with following content
+  ;; ((c++-mode . ((cmake-ide-build-dir . "path/to/your/project/build"))))
+
+  (add-hook 'c++-mode-hook #'(lambda ()
+			       (setf company-backends '())
+			       (add-to-list 'company-backends 'company-keywords)
+			       (add-to-list 'company-backends 'company-irony)
+			       (add-to-list 'company-backends 'company-irony-c-headers)))
+
+  (add-hook 'c++-mode-hook 'my/flycheck)
 
   (use-package rtags
-    :ensure t
-    :config
-    (progn
-      (unless (rtags-executable-find "rc") (error "Binary rc is not installed!"))
-      (unless (rtags-executable-find "rdm") (error "Binary rdm is not installed!"))
+    :commands rtags-start-process-unless-running
+    :config (progn
+	      (message "Rtags loaded")
+	      (use-package company-rtags)))
 
-      (define-key c-mode-base-map (kbd "M-.") 'rtags-find-symbol-at-point)
-      (define-key c-mode-base-map (kbd "M-,") 'rtags-find-references-at-point)
-      (define-key c-mode-base-map (kbd "M-?") 'rtags-display-summary)
-      (rtags-enable-standard-keybindings)
-      ;; Shutdown rdm when leaving emacs.
-      (add-hook 'kill-emacs-hook 'rtags-quit-rdm)))
-
-  ;; Use rtags for auto-completion.
-  (use-package company-rtags
-    :ensure t
-    :config
-    (progn
-      (setq rtags-autostart-diagnostics t)
-      (rtags-diagnostics)
-      (setq rtags-completions-enabled t)
-      (push 'company-rtags company-backends)
-      ))
-
-  ;; Live code checking.
-  (use-package flycheck-rtags
-    :ensure t
-    :config
-    (progn
-      ;; ensure that we use only rtags checking
-      ;; https://github.com/Andersbakken/rtags#optional-1
-      (defun setup-flycheck-rtags ()
-	(flycheck-select-checker 'rtags)
-	(setq-local flycheck-highlighting-mode nil) ;; RTags creates more accurate overlays.
-	(setq-local flycheck-check-syntax-automatically nil)
-	(rtags-set-periodic-reparse-timeout 2.0)  ;; Run flycheck 2 seconds after being idle.
-	)
-      (add-hook 'c-mode-hook #'setup-flycheck-rtags)
-      (add-hook 'c++-mode-hook #'setup-flycheck-rtags)
-      ))
+  (defun my/rtags ()
+    "Rtags configuration.
+  Used only for nevigation."
+    (interactive)
+    (rtags-start-process-unless-running)
+    (setq rtags-display-result-backend 'helm)
+    (my/local-set-keys
+     '(
+       ("M-."     .  rtags-find-symbol-at-point)
+	   ("M-?"     .  rtags-find-references-at-point)
+       ("M-,"     .  rtags-location-stack-back)
+       ("C-,"   .    rtags-location-stack-forward)
+       ("C-c r r" .  rtags-rename-symbolrtags-next-match)
+       ))
   
+  (add-hook 'kill-emacs-hook 'rtags-quit-rdm))
 #+end_src
 * ACTIVE Solidity mode 
 #+begin_src emacs-lisp
@@ -1247,33 +1170,33 @@
 			   )))))
 	(helm :sources '(you-source)))))
 #+end_src
-* ACTIVE Yasnippet / Yankpad
+* DISABLED Yasnippet / Yankpad
 #+begin_src emacs-lisp
   ;; Yet another snippet extension program
-  (use-package yasnippet
-    :diminish yas-minor-mode
-    :config
-      (yas-global-mode 1)
-      ;; respect the spacing in my snippet declarations
-      (setq yas-indent-line 'fixed)
-  )
+  ;; (use-package yasnippet
+  ;;   :diminish yas-minor-mode
+  ;;   :config
+  ;;     (yas-global-mode 1)
+  ;;     ;; respect the spacing in my snippet declarations
+  ;;     (setq yas-indent-line 'fixed)
+  ;; )
 
   ;; Nice “interface” to said program
-  (use-package yankpad
-    ;; :if company-mode ;; load & initialise only if company-mode is defined
-    :demand t
-    :init
-      ;; Location of templates
-      (setq yankpad-file "~/.emacs.d/yankpad.org")
-      (setq yankpad-category "Category: Default")
-    :config
-      ;; If you want to complete snippets using company-mode
-      ;; (add-to-list 'company-backends #'company-yankpad)
-      ;; If you want to expand snippets with hippie-expand
-      ;; (add-to-list 'hippie-expand-try-functions-list #'yankpad-expand)
-      ;; Load the snippet templates -- useful after yankpad is altered
-      (add-hook 'after-init-hook 'yankpad-reload)
-  )
+  ;; (use-package yankpad
+  ;;   ;; :if company-mode ;; load & initialise only if company-mode is defined
+  ;;   :demand t
+  ;;   :init
+  ;;     ;; Location of templates
+  ;;     (setq yankpad-file "~/.emacs.d/yankpad.org")
+  ;;     (setq yankpad-category "Category: Default")
+  ;;   :config
+  ;;     ;; If you want to complete snippets using company-mode
+  ;;     ;; (add-to-list 'company-backends #'company-yankpad)
+  ;;     ;; If you want to expand snippets with hippie-expand
+  ;;     ;; (add-to-list 'hippie-expand-try-functions-list #'yankpad-expand)
+  ;;     ;; Load the snippet templates -- useful after yankpad is altered
+  ;;     (add-hook 'after-init-hook 'yankpad-reload)
+  ;; )
 
   ;; Elementary textual completion backend.
   ;; (setq company-backends
@@ -1403,4 +1326,33 @@
 		 symon-windows-battery-monitor))))
   (symon-mode)
   )
+#+end_src
+* ACTIVE Openwith
+#+begin_src emacs-lisp
+      (when (require 'openwith nil 'noerror)
+	(setq openwith-associations
+	      (list
+	       (list (openwith-make-extension-regexp
+		      '("mpg" "mpeg" "mp3" "mp4"
+			"avi" "wmv" "wav" "mov" "flv"
+			"ogm" "ogg" "mkv"))
+		     "vlc"
+		     '(file))
+	       (list (openwith-make-extension-regexp
+		      '("xbm" "pbm" "pgm" "ppm" "pnm"
+			"png" "gif" "bmp" "tif" "jpeg" "jpg"))
+		     "display"
+		     '(file))
+	       (list (openwith-make-extension-regexp
+		      '("doc" "xls" "ppt" "odt" "ods" "odg" "odp"))
+		     "libreoffice"
+		     '(file))
+	       '("\\.lyx" "lyx" (file))
+	       '("\\.chm" "kchmviewer" (file))
+	       (list (openwith-make-extension-regexp
+		      '("pdf" "ps" "ps.gz" "dvi"))
+		     "evince"
+		     '(file))
+	       ))
+	(openwith-mode 1))
 #+end_src
