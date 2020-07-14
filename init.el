@@ -1,7 +1,7 @@
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 (require 'org)
 (org-babel-load-file
-  (expand-file-name "settings.org" "/home/cr0c0/Dokumente/using-emacs/"))
+  (expand-file-name "settings.org" "/home/bu6hunt3r/Dokumente/using-emacs/"))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -17,9 +17,11 @@
  '(font-size--default-size default-size)
  '(helm-youtube-key (quote AIzaSyDfs3niGPbVTgnd7CdinQhWfYo9haClBwQ))
  '(nand2tetris-tools-dir (quote /home/cr0c0/nand2tetris/tools))
+ '(org-agenda-files nil)
  '(package-selected-packages
    (quote
-    (undo-fu nand2tetris irony-eldoc undo-tree counsel swiper lorem-ipsum tabbar ace-window org-bullets which-key try use-package))))
+    (ryo-modal modalka autopair wavefront-obj-mode frog-jump-buffer dumb-jump tickscript-mode company-jedi openwith undo-fu nand2tetris irony-eldoc undo-tree counsel swiper lorem-ipsum tabbar ace-window org-bullets which-key try use-package)))
+ '(x86-lookup-pdf "/home/bu6hunt3r/Dokumente/intel.pdf"))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
