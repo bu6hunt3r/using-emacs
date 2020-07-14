@@ -1464,7 +1464,9 @@
      ("h" backward-char)
      ("j" next-line)
      ("k" previous-line)
-     ("l" forward-char))
+     ("l" forward-char)
+     ("a" beginning-of-line)
+     ("e" end-of-line))
 
     (ryo-modal-keys
      ;; First argument to ryo-modal-keys may be a list of keywords.
