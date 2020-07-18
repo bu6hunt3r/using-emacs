@@ -1501,3 +1501,20 @@
 	       ("m" git-gutter:mark-hunk "mark")
 	       ("q" nil "cancel" :color blue))))
 #+END_SRC
+
+* ACTIVE fzf in notes directory
+#+BEGIN_SRC emacs-lisp
+(use-package fzf
+  :bind ("C-S-s" . bu6hunt3r/fzf/notes)
+
+  :config
+  (customize-set-variable 'fzf/args
+			  "-x --color bw --print-query --delimiter=: --nth=3")
+  (customize-set-variable 'fzf/executable
+			  "/usr/bin/fzf")
+  (defvar bu6hunt3r/fzf/notes-directory "/home/bu6hunt3r/Dokumente/notes")
+  (defun bu6hunt3r/fzf/notes ()
+    (interactive)
+    (fzf/start bu6hunt3r/fzf/notes-directory
+	       "ag -f --nobreak --noheading .")))
+#+END_SRC

@@ -20,7 +20,7 @@
  '(org-agenda-files nil)
  '(package-selected-packages
    (quote
-    (ryo-modal modalka autopair wavefront-obj-mode frog-jump-buffer dumb-jump tickscript-mode company-jedi openwith undo-fu nand2tetris irony-eldoc undo-tree counsel swiper lorem-ipsum tabbar ace-window org-bullets which-key try use-package)))
+    (web-mode fzf ryo-modal modalka autopair wavefront-obj-mode frog-jump-buffer dumb-jump tickscript-mode company-jedi openwith undo-fu nand2tetris irony-eldoc undo-tree counsel swiper lorem-ipsum tabbar ace-window org-bullets which-key try use-package)))
  '(x86-lookup-pdf "/home/bu6hunt3r/Dokumente/intel.pdf"))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
