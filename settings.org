@@ -112,7 +112,7 @@
     :config
     (dashboard-setup-startup-hook))
 
-  (setq dashboard-startup-banner "/home/bu6hunt3r/Dokumente/using-emacs/pony.png")
+  (setq dashboard-startup-banner "/home/cr0c0/Dokumente/using-emacs/unicorn-resized.png")
 
   (use-package nyan-mode
       :ensure t
@@ -440,7 +440,7 @@
 #+begin_src emacs-lisp
   (setenv "PATH"
 	  (concat
-	   "/home/bu6hunt3r/.gem/ruby/2.7.0/bin" ":"
+	   "/home/cr0c0/.gem/ruby/2.7.0/bin" ":"
 	   (getenv "PATH")))
 
   (use-package ruby-electric
@@ -479,7 +479,7 @@
   :ensure t
   :init
   (progn
-    (load-file "/home/bu6hunt3r/.emacs.d/lisp/linum-highlight-current-line-number.el")
+    (load-file "/home/cr0c0/.emacs.d/lisp/linum-highlight-current-line-number.el")
     (setq linum-format 'linum-highlight-current-line-number)
     ;;(set-face-background 'line-number "#033f01a90ccc")
     ))
@@ -1454,67 +1454,75 @@
 #+END_SRC
 * ACTIVE modal-editing
 #+BEGIN_SRC emacs-lisp
-  (use-package ryo-modal
-    :commands ryo-modal-mode
-    :bind ("C-c SPC" . ryo-modal-mode)
-    :config
-    (ryo-modal-keys
-     ("," ryo-modal-repeat)
-     ("q" ryo-modal-mode)
-     ("h" backward-char)
-     ("j" next-line)
-     ("k" previous-line)
-     ("l" forward-char)
-     ("a" beginning-of-line)
-     ("e" end-of-line))
+    (use-package ryo-modal
+      :commands ryo-modal-mode
+      :bind ("C-c SPC" . ryo-modal-mode)
+      :config
+      (ryo-modal-keys
+       ("," ryo-modal-repeat)
+       ("q" ryo-modal-mode)
+       ("h" backward-char)
+       ("j" next-line)
+       ("k" previous-line)
+       ("l" forward-char)
+       ("a" beginning-of-line)
+       ("e" end-of-line)
+       ("w" forward-word)
+       ("b" backward-word))
 
-    (ryo-modal-keys
-     ;; First argument to ryo-modal-keys may be a list of keywords.
-     ;; These keywords will be applied to all keybindings.
-     (:norepeat t)
-     ("0" "M-0")
-     ("1" "M-1")
-     ("2" "M-2")
-     ("3" "M-3")
-     ("4" "M-4")
-     ("5" "M-5")
-     ("6" "M-6")
-     ("7" "M-7")
-     ("8" "M-8")
-     ("9" "M-9"))
+      (ryo-modal-keys
+       ;; First argument to ryo-modal-keys may be a list of keywords.
+       ;; These keywords will be applied to all keybindings.
+       (:norepeat t)
+       ("0" "M-0")
+       ("1" "M-1")
+       ("2" "M-2")
+       ("3" "M-3")
+       ("4" "M-4")
+       ("5" "M-5")
+       ("6" "M-6")
+       ("7" "M-7")
+       ("8" "M-8")
+       ("9" "M-9"))
 
-    (ryo-modal-keys
-   ("c"
-    (("c" kill-whole-line :then 'open-line :exit t)
-     ("w" kill-word :exit t))))
+      (ryo-modal-keys
+     ("c"
+      (("c" kill-whole-line :then 'open-line :exit t)
+       ("w" kill-word :exit t))))
 
-    (ryo-modal-key
-   "SPC g" :hydra
-   '(hydra-git ()
-	       "A hydra for git!"
-	       ("g" magit-status "magit" :color blue)
-	       ("j" git-gutter:next-hunk "next")
-	       ("k" git-gutter:previous-hunk "previous")
-	       ("d" git-gutter:popup-hunk "diff")
-	       ("s" git-gutter:stage-hunk "stage")
-	       ("r" git-gutter:revert-hunk "revert")
-	       ("m" git-gutter:mark-hunk "mark")
-	       ("q" nil "cancel" :color blue))))
+      (ryo-modal-key
+     "SPC g" :hydra
+     '(hydra-git ()
+		 "A hydra for git!"
+		 ("g" magit-status "magit" :color blue)
+		 ("j" git-gutter:next-hunk "next")
+		 ("k" git-gutter:previous-hunk "previous")
+		 ("d" git-gutter:popup-hunk "diff")
+		 ("s" git-gutter:stage-hunk "stage")
+		 ("r" git-gutter:revert-hunk "revert")
+		 ("m" git-gutter:mark-hunk "mark")
+		 ("q" nil "cancel" :color blue)))
+
+      (ryo-modal-major-mode-keys
+	'python-mode
+	("J" python-nav-forward-defun)
+	("K" python-nav-backward-defun)))
+
 #+END_SRC
 
 * ACTIVE fzf in notes directory
 #+BEGIN_SRC emacs-lisp
 (use-package fzf
-  :bind ("C-S-s" . bu6hunt3r/fzf/notes)
+  :bind ("C-S-s" . cr0c0/fzf/notes)
 
   :config
   (customize-set-variable 'fzf/args
 			  "-x --color bw --print-query --delimiter=: --nth=3")
   (customize-set-variable 'fzf/executable
 			  "/usr/bin/fzf")
-  (defvar bu6hunt3r/fzf/notes-directory "/home/bu6hunt3r/Dokumente/notes")
-  (defun bu6hunt3r/fzf/notes ()
+  (defvar cr0c0/fzf/notes-directory "/home/cr0c0/Dokumente/notes")
+  (defun cr0c0/fzf/notes ()
     (interactive)
-    (fzf/start bu6hunt3r/fzf/notes-directory
+    (fzf/start cr0c0/fzf/notes-directory
 	       "ag -f --nobreak --noheading .")))
 #+END_SRC
