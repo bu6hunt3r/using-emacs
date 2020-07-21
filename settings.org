@@ -440,7 +440,7 @@
 #+begin_src emacs-lisp
   (setenv "PATH"
 	  (concat
-	   "/home/cr0c0/.gem/ruby/2.6.0/bin" ":"
+	   "/home/cr0c0/.gem/ruby/2.7.0/bin" ":"
 	   (getenv "PATH")))
 
   (use-package ruby-electric
@@ -539,7 +539,7 @@
 	       (cons "Show entry in org-brain" 'helm-org-rifle-open-in-brain)
 	       t)
 #+end_src
-
+*
 * ACTIVE Org agenda settings
 #+begin_src emacs-lisp
   (setq org-agenda-files (list "~/org/brain/todo.org"))
@@ -575,11 +575,10 @@
   (use-package cheatsheet
     :ensure t)
   (require 'cheatsheet)
-  (load-file "~/.dotfiles/common/emacs/cheats.el")
+  (load-file "~/Dokumente/using-emacs/cheats.el")
 #+end_src
 
 #+RESULTS:
-: t
 * ACTIVE mu4e settings
 #+begin_src emacs-lisp
   (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e/")
@@ -862,7 +861,6 @@
   ;; (require 'pdf-tools)
   ;; (require 'org-pdfview)
 #+end_src
-* 
 * ACTIVE x86 Lookup / nasm mode
 #+begin_src emacs-lisp
   (use-package nasm-mode
@@ -1093,10 +1091,10 @@
    ;;(setq lsp-log-io t)
    )
 
-  (use-package eglot
-    :ensure t
-    :config
-    (add-to-list 'eglot-server-programs '(haskell-mode . ("/home/cr0c0/.cabal/bin/ghcide" "--lsp"))))
+  ;; (use-package eglot
+  ;;   :ensure t
+  ;;   :config
+  ;; ;;   (add-to-list 'eglot-server-programs '(haskell-mode . ("/home/cr0c0/.cabal/bin/ghcide" "--lsp"))))
 #+end_src
 * ACTIVE Helm Youtube
 #+begin_src emacs-lisp
@@ -1180,8 +1178,13 @@
   ;;     ;; respect the spacing in my snippet declarations
   ;;     (setq yas-indent-line 'fixed)
   ;; )
+<<<<<<< HEAD
 
   ;; Nice “interface” to said program
+=======
+  ;; 
+  ;; ;; Nice “interface” to said program
+>>>>>>> modal_editing
   ;; (use-package yankpad
   ;;   ;; :if company-mode ;; load & initialise only if company-mode is defined
   ;;   :demand t
@@ -1194,8 +1197,13 @@
   ;;     ;; (add-to-list 'company-backends #'company-yankpad)
   ;;     ;; If you want to expand snippets with hippie-expand
   ;;     ;; (add-to-list 'hippie-expand-try-functions-list #'yankpad-expand)
+<<<<<<< HEAD
   ;;     ;; Load the snippet templates -- useful after yankpad is altered
   ;;     (add-hook 'after-init-hook 'yankpad-reload)
+=======
+      ;; Load the snippet templates -- useful after yankpad is altered
+  ;; (add-hook 'after-init-hook 'yankpad-reload)
+>>>>>>> modal_editing
   ;; )
 
   ;; Elementary textual completion backend.
@@ -1289,47 +1297,50 @@
 
   (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
 #+end_src
-* ACTIVE Symon
+* DISABLED Symon
 #+begin_src emacs-lisp
-;; System monitor in bar
-(use-package symon
-  :defer 3
-  :ensure t
-  :config
-  (setq symon-sparkline-type 'bounded)
-  (define-symon-monitor symon-current-date-time-monitor
-    :interval 5
-    :display (propertize
-	      (format-time-string "%k:%M %a %d %b %Y ")
-	      'face 'font-lock-type-face))
-  (setq symon-monitors
-	(cond ((memq system-type '(gnu/linux cygwin))
-	       '(symon-current-date-time-monitor
-		 symon-linux-memory-monitor
-		 symon-linux-cpu-monitor
-		 symon-linux-network-rx-monitor
-		 symon-linux-network-tx-monitor
-		 symon-linux-battery-monitor))
-	      ((memq system-type '(darwin))
-	       '(symon-current-date-time-monitor
-		 symon-darwin-memory-monitor
-		 symon-darwin-cpu-monitor
-		 symon-darwin-network-rx-monitor
-		 symon-darwin-network-tx-monitor
-		 symon-darwin-battery-monitor))
-	      ((memq system-type '(windows-nt))
-	       '(symon-current-date-time-monitor
-		 symon-windows-memory-monitor
-		 symon-windows-cpu-monitor
-		 symon-windows-network-rx-monitor
-		 symon-windows-network-tx-monitor
-		 symon-windows-battery-monitor))))
-  (symon-mode)
-  )
+  ;; System monitor in bar
+  ;; (use-package symon
+  ;;   :defer 3
+  ;;   :ensure t
+  ;;   :config
+  ;;   (setq symon-sparkline-type 'bounded)
+  ;;   (define-symon-monitor symon-current-date-time-monitor
+  ;;     :interval 5
+  ;;     :display (propertize
+  ;; 	      (format-time-string "%k:%M %a %d %b %Y ")
+  ;; 	      'face 'font-lock-type-face))
+  ;;   (setq symon-monitors
+  ;; 	(cond ((memq system-type '(gnu/linux cygwin))
+  ;; 	       '(symon-current-date-time-monitor
+  ;; 		 symon-linux-memory-monitor
+  ;; 		 symon-linux-cpu-monitor
+  ;; 		 symon-linux-network-rx-monitor
+  ;; 		 symon-linux-network-tx-monitor
+  ;; 		 symon-linux-battery-monitor))
+  ;; 	      ((memq system-type '(darwin))
+  ;; 	       '(symon-current-date-time-monitor
+  ;; 		 symon-darwin-memory-monitor
+  ;; 		 symon-darwin-cpu-monitor
+  ;; 		 symon-darwin-network-rx-monitor
+  ;; 		 symon-darwin-network-tx-monitor
+  ;; 		 symon-darwin-battery-monitor))
+  ;; 	      ((memq system-type '(windows-nt))
+  ;; 	       '(symon-current-date-time-monitor
+  ;; 		 symon-windows-memory-monitor
+  ;; 		 symon-windows-cpu-monitor
+  ;; 		 symon-windows-network-rx-monitor
+  ;; 		 symon-windows-network-tx-monitor
+  ;; 		 symon-windows-battery-monitor))))
+  ;;   (symon-mode)
+  ;;   )
 #+end_src
 * ACTIVE Openwith
-#+begin_src emacs-lisp
-      (when (require 'openwith nil 'noerror)
+#+BEGIN_SRC emacs-lisp
+  (use-package openwith
+    :ensure t
+    :config
+       (when (require 'openwith nil 'noerror)
 	(setq openwith-associations
 	      (list
 	       (list (openwith-make-extension-regexp
@@ -1354,5 +1365,97 @@
 		     "evince"
 		     '(file))
 	       ))
-	(openwith-mode 1))
-#+end_src
+	(openwith-mode 1)))
+#+END_SRC
+* ACTIVE Ripgrep
+#+BEGIN_SRC emacs-lisp
+  (use-package deadgrep
+    :ensure t
+    :config
+    (progn
+      (global-set-key (kbd "<f5>") #'deadgrep)))
+#+END_SRC
+* ACTIVE dictcc
+#+BEGIN_SRC emacs-lisp
+  (use-package dictcc
+    :ensure t)
+#+END_SRC
+* ACTIVE x86-lookup
+#+BEGIN_SRC emacs-lisp
+  (use-package x86-lookup
+    :ensure t)
+#+END_SRC
+* ACTIVE modal-editing
+#+BEGIN_SRC emacs-lisp
+    (use-package ryo-modal
+      :commands ryo-modal-mode
+      :bind ("C-c SPC" . ryo-modal-mode)
+      :config
+      (ryo-modal-keys
+       ("," ryo-modal-repeat)
+       ("q" ryo-modal-mode)
+       ("h" backward-char)
+       ("j" next-line)
+       ("k" previous-line)
+       ("l" forward-char)
+       ("a" beginning-of-line)
+       ("e" end-of-line)
+       ("w" forward-word)
+       ("b" backward-word))
+
+      (ryo-modal-keys
+       ;; First argument to ryo-modal-keys may be a list of keywords.
+       ;; These keywords will be applied to all keybindings.
+       (:norepeat t)
+       ("0" "M-0")
+       ("1" "M-1")
+       ("2" "M-2")
+       ("3" "M-3")
+       ("4" "M-4")
+       ("5" "M-5")
+       ("6" "M-6")
+       ("7" "M-7")
+       ("8" "M-8")
+       ("9" "M-9"))
+
+      (ryo-modal-keys
+     ("c"
+      (("c" kill-whole-line :then 'open-line :exit t)
+       ("w" kill-word :exit t))))
+
+      (ryo-modal-key
+     "SPC g" :hydra
+     '(hydra-git ()
+		 "A hydra for git!"
+		 ("g" magit-status "magit" :color blue)
+		 ("j" git-gutter:next-hunk "next")
+		 ("k" git-gutter:previous-hunk "previous")
+		 ("d" git-gutter:popup-hunk "diff")
+		 ("s" git-gutter:stage-hunk "stage")
+		 ("r" git-gutter:revert-hunk "revert")
+		 ("m" git-gutter:mark-hunk "mark")
+		 ("q" nil "cancel" :color blue)))
+
+      (ryo-modal-major-mode-keys
+	'python-mode
+	("J" python-nav-forward-defun)
+	("K" python-nav-backward-defun)))
+
+#+END_SRC
+
+* ACTIVE fzf in notes directory
+#+BEGIN_SRC emacs-lisp
+(use-package fzf
+  :bind ("C-S-s" . cr0c0/fzf/notes)
+
+  :config
+  (customize-set-variable 'fzf/args
+			  "-x --color bw --print-query --delimiter=: --nth=3")
+  (customize-set-variable 'fzf/executable
+			  "/usr/bin/fzf")
+  (defvar cr0c0/fzf/notes-directory "/home/cr0c0/Dokumente/notes")
+  (defun cr0c0/fzf/notes ()
+    (interactive)
+    (fzf/start cr0c0/fzf/notes-directory
+	       "ag -f --nobreak --noheading .")))
+#+END_SRC
