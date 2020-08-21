@@ -538,37 +538,51 @@
   (add-to-list 'helm-org-rifle-actions
 	       (cons "Show entry in org-brain" 'helm-org-rifle-open-in-brain)
 	       t)
+
 #+end_src
-*
+
+#+begin_src emacs-lisp
+    (defun commit-and-push-todos ()
+      (let* ((todo-file (expand-file-name "todo.org" org-brain-path)))
+	(when (magit-anything-modified-p nil todo-file)
+	  (magit-stage-file todo-file)
+	  (magit-call-git "commit" "-m" "todo.org update")
+	  (magit-call-git "push" "origin"))))
+
+    (add-hook 'kill-emacs-hook #'commit-and-push-todos)
+
+#+end_src
 * ACTIVE Org agenda settings
 #+begin_src emacs-lisp
   (setq org-agenda-files (quote ("~/org/brain/todo.org")))
 #+end_src
 * ACTIVE Internal Org mode links 
 #+begin_src emacs-lisp
-  ;; use ivy to insert a link to a heading in the current document
-  ;; based on `worf-goto`
-  (defun my/worf-insert-internal-link ()
-    "Use ivy to insert a link to aheading in the current `org-mode'
-  document. Code is based on `worf-goto'."
-    (interactive)
-    (let ((cands (worf--goto-candidates)))
-      (ivy-read "Heading: " cands
-		:action 'bjm/worf-insert-internal-link-action)))
+  ;; (use-package worf
+  ;;   :ensure t)
+  ;; ;; use ivy to insert a link to a heading in the current document
+  ;; ;; based on `worf-goto`
+  ;; (defun my/worf-insert-internal-link ()
+  ;;   "Use ivy to insert a link to aheading in the current `org-mode'
+  ;; document. Code is based on `worf-goto'."
+  ;;   (interactive)
+  ;;   (let ((cands (worf--goto-candidates)))
+  ;;     (ivy-read "Heading: " cands
+  ;; 	      :action 'bjm/worf-insert-internal-link-action)))
 
-  (defun my/worf-insert-internal-link-action (x)
-    "Insert link for `bjm/worf-insert-internal-link'"
-    ;; goto heading
-    (save-excursion
-      (goto-char (cdr x))
-      ;; store link
-      (call-interactively 'org-store-link)
-      )
-    ;; return to original point and insert link
-    (org-insert-last-stored-link 1)
-    ;; org-insert-last-stored-link adds a newline, so
-    ;; delete this
-    (delete-backward-char 1))
+  ;; (defun my/worf-insert-internal-link-action (x)
+  ;;   "Insert link for `my/worf-insert-internal-link'"
+  ;;   ;; goto heading
+  ;;   (save-excursion
+  ;;     (goto-char (cdr x))
+  ;;     ;; store link
+  ;;     (call-interactively 'org-store-link)
+  ;;     )
+  ;;   ;; return to original point and insert link
+  ;;   (org-insert-last-stored-link 1)
+  ;;   ;; org-insert-last-stored-link adds a newline, so
+  ;;   ;; delete this
+  ;;   (delete-backward-char 1))
 #+end_src
 * ACTIVE Load cheatsheets
 #+begin_src emacs-lisp
