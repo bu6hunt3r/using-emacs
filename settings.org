@@ -542,7 +542,7 @@
 *
 * ACTIVE Org agenda settings
 #+begin_src emacs-lisp
-  (setq org-agenda-files (list "~/org/brain/todo.org"))
+  (setq org-agenda-files (quote ("~/org/brain/todo.org")))
 #+end_src
 * ACTIVE Internal Org mode links 
 #+begin_src emacs-lisp
@@ -1178,13 +1178,8 @@
   ;;     ;; respect the spacing in my snippet declarations
   ;;     (setq yas-indent-line 'fixed)
   ;; )
-<<<<<<< HEAD
-
-  ;; Nice “interface” to said program
-=======
   ;; 
   ;; ;; Nice “interface” to said program
->>>>>>> modal_editing
   ;; (use-package yankpad
   ;;   ;; :if company-mode ;; load & initialise only if company-mode is defined
   ;;   :demand t
@@ -1197,13 +1192,8 @@
   ;;     ;; (add-to-list 'company-backends #'company-yankpad)
   ;;     ;; If you want to expand snippets with hippie-expand
   ;;     ;; (add-to-list 'hippie-expand-try-functions-list #'yankpad-expand)
-<<<<<<< HEAD
   ;;     ;; Load the snippet templates -- useful after yankpad is altered
   ;;     (add-hook 'after-init-hook 'yankpad-reload)
-=======
-      ;; Load the snippet templates -- useful after yankpad is altered
-  ;; (add-hook 'after-init-hook 'yankpad-reload)
->>>>>>> modal_editing
   ;; )
 
   ;; Elementary textual completion backend.
