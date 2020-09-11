@@ -29,6 +29,11 @@
 #+begin_src emacs-lisp
   (defalias 'yes-or-no-p 'y-or-n-p)
 #+end_src
+* ACTIVE Exec.path-from-shell
+#+begin_src emacs-lisp
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
+#+end_src
 * ACTIVE Adding local files to load path
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/lisp/")
@@ -112,7 +117,7 @@
     :config
     (dashboard-setup-startup-hook))
 
-  (setq dashboard-startup-banner "/home/cr0c0/Dokumente/using-emacs/unicorn-resized.png")
+  (setq dashboard-startup-banner "/home/cr0c0/Dokumente/using-emacs/unicorn-resized2.png")
 
   (use-package nyan-mode
       :ensure t
@@ -130,7 +135,7 @@
 #+end_src
 * ACTIVE Font settings
 #+begin_src emacs-lisp
-(set-default-font "3270Medium Nerd Font Mono Medium")
+(set-frame-font "3270Medium Nerd Font Mono Medium")
 (load-file "~/.emacs.d/font-size.el")
 (require 'font-size)
 (font-size-init 14)
@@ -148,54 +153,30 @@
 	  :config 
 	  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
+  (setq org-todo-keywords '((type "TODO" "NEXT" "WAITING" "DONE")))
+
+  (setq org-agenda-custom-commands
+	'(("w" todo "WAITING" nil)
+	  ("n" todo "NEXT" nil)
+	  ("d" "Agenda + Next Actions" ((agenda) (todo "NEXT")))))
+  (setq org-tag-alist '(("READING" . ?r)
+			("BUROCRACY" . ?c)
+			("MAIL" . ?m)
+			("HOME" . ?h)))
+
+  ;; I like to color-code task types.
+  (setf org-todo-keyword-faces '(("NEXT" . (:foreground "yellow" :background "red" :bold t :weight bold))
+				 ("TODO" . (:foreground "cyan" :background "steelblue" :bold t :weight bold))
+				 ("WAITING" . (:foreground "yellow" :background "magenta2" :bold t :weight bold))
+				 ("DONE" . (:foreground "gray50" :background "gray30"))))
+
   ;; store org mode links to messages
-  (require 'org-mu4e)
+  ;; (require 'org-mu4e)
   ;; store link to message if in header view, not to header query
   (setq org-capture-templates
 	'(("r" "reply-to" entry (file+headline "~/org/brain/todo.org" "Mails to reply to")
 	   "* TODO [#A] %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n%a\n")))
 
-  ;; (defun org-read-entry-property-name ()
-  ;;   "Read a property name from the current entry."
-  ;;   (let ((completion-ignore-case t)
-  ;; 	(default-prop (or (and (org-at-property-p)
-  ;; 			       (org-match-string-no-properties 2))
-  ;; 			  org-last-set-property)))
-  ;;     (org-completing-read
-  ;;      (format "Property [%s]: " (if default-prop default-prop ""))
-  ;;      (org-entry-properties nil nil)
-  ;;      nil nil nil nil default-prop)))
-  ;; 
-  ;; (defun my-org-region-to-property (&optional property)
-  ;;   "Copies the region as value to an Org-mode property"
-  ;;   (interactive)
-  ;;   ;; if no region is defined, do nothing
-  ;;   (if (use-region-p)
-  ;;       ;; if a region string is found, ask for a property and set property to
-  ;;       ;; the string in the region
-  ;;       (let ((val (replace-regexp-in-string
-  ;; 		  "\\`[ \t\n]*" ""
-  ;; 		  (replace-regexp-in-string "[ \t\n]*\\'" ""
-  ;; 					    (substring (buffer-string)
-  ;; 						       (- (region-beginning) 1)
-  ;; 						       (region-end))))
-  ;; 		 )
-  ;; 	    ;; if none was stated by user, read property from user
-  ;; 	    (prop (or property
-  ;; 		      (org-read-entry-property-name))))
-  ;; 	;; set property
-  ;; 	(org-set-property prop val))))
-  ;; 
-  ;; (use-package yankpad
-  ;;   :ensure t
-  ;;   :defer 10
-  ;;   :init
-  ;;   (setq yankpad-file "~/org/brain/yankpad.org")
-  ;;   :config
-  ;;   (bind-key "<f7>" 'yankpad-map)
-  ;;   (bind-key "<f12>" 'yankpad-expand)
-  ;;   ;; If you want to complete snippets using company-mode
-  ;;   (add-to-list 'company-backends #'company-yankpad))
 #+end_src
 * ACTIVE Ido settings
 #+begin_src emacs-lisp
@@ -335,7 +316,7 @@
     (global-auto-complete-mode t)
     ))
 ;; elisp autocompletion
-(add-hook 'emacs-lisp-mode-hook 'ielm-auto-complete)
+;; (add-hook 'emacs-lisp-mode-hook )
 #+end_src
 * ACTIVE Use F5 to reload file into current buffer
 #+BEGIN_SRC emacs-lisp
@@ -558,31 +539,31 @@
 #+end_src
 * ACTIVE Internal Org mode links 
 #+begin_src emacs-lisp
-  ;; (use-package worf
-  ;;   :ensure t)
-  ;; ;; use ivy to insert a link to a heading in the current document
-  ;; ;; based on `worf-goto`
-  ;; (defun my/worf-insert-internal-link ()
-  ;;   "Use ivy to insert a link to aheading in the current `org-mode'
-  ;; document. Code is based on `worf-goto'."
-  ;;   (interactive)
-  ;;   (let ((cands (worf--goto-candidates)))
-  ;;     (ivy-read "Heading: " cands
-  ;; 	      :action 'bjm/worf-insert-internal-link-action)))
+(use-package worf
+  :ensure t)
+;; use ivy to insert a link to a heading in the current document
+;; based on `worf-goto`
+(defun my/worf-insert-internal-link ()
+  "Use ivy to insert a link to aheading in the current `org-mode'
+document. Code is based on `worf-goto'."
+   (interactive)
+   (let ((cands (worf--goto-candidates)))
+     (ivy-read "Heading: " cands
+ 	      :action 'my/worf-insert-internal-link-action)))
 
-  ;; (defun my/worf-insert-internal-link-action (x)
-  ;;   "Insert link for `my/worf-insert-internal-link'"
-  ;;   ;; goto heading
-  ;;   (save-excursion
-  ;;     (goto-char (cdr x))
-  ;;     ;; store link
-  ;;     (call-interactively 'org-store-link)
-  ;;     )
-  ;;   ;; return to original point and insert link
-  ;;   (org-insert-last-stored-link 1)
-  ;;   ;; org-insert-last-stored-link adds a newline, so
-  ;;   ;; delete this
-  ;;   (delete-backward-char 1))
+ (defun my/worf-insert-internal-link-action (x)
+   "Insert link for `my/worf-insert-internal-link'"
+   ;; goto heading
+   (save-excursion
+     (goto-char (cdr x))
+     ;; store link
+     (call-interactively 'org-store-link)
+     )
+   ;; return to original point and insert link
+   (org-insert-last-stored-link 1)
+   ;; org-insert-last-stored-link adds a newline, so
+   ;; delete this
+   (delete-backward-char 1))
 #+end_src
 * ACTIVE Load cheatsheets
 #+begin_src emacs-lisp
@@ -595,24 +576,30 @@
 #+RESULTS:
 * ACTIVE mu4e settings
 #+begin_src emacs-lisp
-  (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e/")
-  (require 'smtpmail)
+  (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e/")
 
   ;; smtp
+  (require 'smtpmail)
   (setq message-send-mail-function 'smtpmail-send-it
-	smtpmail-starttls-credentials
-	'(("smtp.gmail.com" 587 nil nil))
-	smtpmail-default-smtp-server "smtp.gmail.com"
-	smtpmail-smtp-server "smtp.gmail.com"
-	smtpmail-smtp-service 587
-	smtpmail-debug-info t)
+       smtpmail-stream-type 'starttls
+       smtpmail-default-smtp-server "smtp.gmail.com"
+       smtpmail-auth-credentials (expand-file-name "~/.authinfo.gpg")
+       smtpmail-smtp-server "smtp.gmail.com"
+       smtpmail-smtp-service 587
+       smtpmail-debug-info t)
+
+  ;; ;; (setq message-send-mail-function 'smtpmail-send-it
+  ;; ;;       smtpmail-starttls-credentials
+  ;; ;;       '(("smtp.gmail.com" 587 nil nil))
+  ;; ;;       smtpmail-default-smtp-server "smtp.gmail.com"
+  ;; ;;       smtpmail-smtp-server "smtp.gmail.com"
+  ;; ;;       smtpmail-smtp-service 587
+  ;; ;;       smtpmail-debug-info t)
 
   (require 'mu4e)
 
-  (setq mu4e-maildir (expand-file-name "~/mail/Felix1Koch"))
-
   ;; get mail
-  (setq mu4e-get-mail-command "mbsync -c ~/.emacs.d/.mbsyncrc -V gmail"
+  (setq mu4e-get-mail-command "offlineimap"
 	mu4e-update-interval 120
 	mu4e-headers-auto-update t)
 
@@ -623,6 +610,35 @@
       user-full-name  "Felix Koch")
 
   (setq mu4e-change-filenames-when-moving t)
+
+  (setq mu4e-headers-fields '((:human-date . 20)
+			      (:flags . 6)
+			      (:mailing-list . 10)
+			      (:from . 22)
+			      (:subject)))
+  (setq mu4e-headers-include-related t)
+  (setq mu4e-sent-messages-behavior 'delete)
+  (setq mu4e-view-show-addresses t)
+  (setq mu4e-view-show-images t)
+  (setq smtpmail-debug-info t)
+  (setq mm-sign-option 'guided)
+  (setq mml-secure-openpgp-sign-with-sender t)
+
+  (defun sign-or-encrypt-message ()
+    (let ((answer (read-from-minibuffer
+		   "Sign or encrypt?\nEmpty to do nothing.\n[s/e]: ")))
+      (cond
+       ((string-equal answer "s") (progn
+				    (message "Signing message.")
+				    (mml-secure-message-sign-pgpmime)))
+       ((string-equal answer "e") (progn
+				    (message "Encrypt and signing message.")
+				    (mml-secure-message-encrypt-pgpmime)))
+       (t (progn
+	    (message "Dont signing or encrypting message.")
+	    nil)))))
+
+  (add-hook 'message-send-hook 'sign-or-encrypt-message)
 
 #+end_src
 * ACTIVE Notmuch mail settings
@@ -937,11 +953,11 @@
   ;; add it to c++-mode-hook
   (add-hook 'c++-mode-hook 'my/cc-base)
 
-  (add-hook 'c++-mode-hook '(lambda()
-			      (cmake-ide-setup)
-			      (my/local-set-keys
-			       `("C-c C-a" . cmake-ide-compile)
-			       )))
+  ;; (add-hook 'c++-mode-hook '(lambda()
+  ;; 			    (cmake-ide-setup)
+  ;; 			    (my/local-set-keys
+  ;; 			     `("C-c C-a" . cmake-ide-compile)
+  ;; 			     )))
 
   ;; generate informations about current project .dir-locals.el
   ;; with following content
@@ -975,7 +991,7 @@
        ("C-,"   .    rtags-location-stack-forward)
        ("C-c r r" .  rtags-rename-symbolrtags-next-match)
        ))
-  
+
   (add-hook 'kill-emacs-hook 'rtags-quit-rdm))
 #+end_src
 * ACTIVE Solidity mode 
@@ -1341,35 +1357,35 @@
 #+end_src
 * ACTIVE Openwith
 #+BEGIN_SRC emacs-lisp
-  (use-package openwith
-    :ensure t
-    :config
-       (when (require 'openwith nil 'noerror)
-	(setq openwith-associations
-	      (list
-	       (list (openwith-make-extension-regexp
-		      '("mpg" "mpeg" "mp3" "mp4"
-			"avi" "wmv" "wav" "mov" "flv"
-			"ogm" "ogg" "mkv"))
-		     "vlc"
-		     '(file))
-	       (list (openwith-make-extension-regexp
-		      '("xbm" "pbm" "pgm" "ppm" "pnm"
-			"png" "gif" "bmp" "tif" "jpeg" "jpg"))
-		     "display"
-		     '(file))
-	       (list (openwith-make-extension-regexp
-		      '("doc" "xls" "ppt" "odt" "ods" "odg" "odp"))
-		     "libreoffice"
-		     '(file))
-	       '("\\.lyx" "lyx" (file))
-	       '("\\.chm" "kchmviewer" (file))
-	       (list (openwith-make-extension-regexp
-		      '("pdf" "ps" "ps.gz" "dvi"))
-		     "evince"
-		     '(file))
-	       ))
-	(openwith-mode 1)))
+  ;; (use-package openwith
+  ;;   :ensure t
+  ;;   :config
+  ;;      (when (require 'openwith nil 'noerror)
+  ;;       (setq openwith-associations
+  ;; 	    (list
+  ;; 	     (list (openwith-make-extension-regexp
+  ;; 		    '("mpg" "mpeg" "mp3" "mp4"
+  ;; 		      "avi" "wmv" "wav" "mov" "flv"
+  ;; 		      "ogm" "ogg" "mkv"))
+  ;; 		   "vlc"
+  ;; 		   '(file))
+  ;; 	     (list (openwith-make-extension-regexp
+  ;; 		    '("xbm" "pbm" "pgm" "ppm" "pnm"
+  ;; 		      "png" "gif" "bmp" "tif" "jpeg" "jpg"))
+  ;; 		   "display"
+  ;; 		   '(file))
+  ;; 	     (list (openwith-make-extension-regexp
+  ;; 		    '("doc" "xls" "ppt" "odt" "ods" "odg" "odp"))
+  ;; 		   "libreoffice"
+  ;; 		   '(file))
+  ;; 	     '("\\.lyx" "lyx" (file))
+  ;; 	     '("\\.chm" "kchmviewer" (file))
+  ;; 	     (list (openwith-make-extension-regexp
+  ;; 		    '("pdf" "ps" "ps.gz" "dvi"))
+  ;; 		   "evince"
+  ;; 		   '(file))
+  ;; 	     ))
+  ;;       (openwith-mode 1)))
 #+END_SRC
 * ACTIVE Ripgrep
 #+BEGIN_SRC emacs-lisp
@@ -1463,3 +1479,64 @@
     (fzf/start cr0c0/fzf/notes-directory
 	       "ag -f --nobreak --noheading .")))
 #+END_SRC
+* ACTIVE ranger mode
+#+begin_src emacs-lisp  
+(use-package ranger
+    :ensure t)
+#+end_src
+* ACTIVE golang mode
+#+begin_src emacs-lisp
+(setq exec-path (append exec-path '("/home/cr0c0/go/bin")))
+
+(use-package lsp-mode
+  :ensure t
+  :commands (lsp lsp-deferred)
+  :hook (go-mode . lsp-deferred))
+
+;;Set up before-save hooks to format buffer and add/delete imports.
+;;Make sure you don't have other gofmt/goimports hooks enabled.
+
+(defun lsp-go-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+
+;;Optional - provides fancier overlays.
+
+(use-package lsp-ui
+  :ensure t
+  :commands lsp-ui-mode
+  :init
+)
+
+;;Company mode is a standard completion package that works well with lsp-mode.
+;;company-lsp integrates company mode completion with lsp-mode.
+;;completion-at-point also works out of the box but doesn't support snippets.
+
+(use-package company
+  :ensure t
+  :config
+  (setq company-idle-delay 0)
+  (setq company-minimum-prefix-length 1))
+
+(use-package company-lsp
+  :ensure t
+  :commands company-lsp)
+
+;;Optional - provides snippet support.
+
+(use-package yasnippet
+  :ensure t
+  :commands yas-minor-mode
+  :hook (go-mode . yas-minor-mode))
+
+;;lsp-ui-doc-enable is false because I don't like the popover that shows up on the right
+;;I'll change it if I want it back
+
+
+(setq lsp-ui-doc-enable nil
+      lsp-ui-peek-enable t
+      lsp-ui-sideline-enable t
+      lsp-ui-imenu-enable t
+      lsp-ui-flycheck-enable t)
+#+end_src

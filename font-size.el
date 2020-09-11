@@ -27,7 +27,7 @@
 (defgroup font-size nil
   "Change font size.")
 
-(defcustom font-size--default-size 16
+(defcustom font-size--default-size 12
   "Default font size (default 16)."
   :type 'number
   :group 'font-size)
