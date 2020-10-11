@@ -29,11 +29,6 @@
 #+begin_src emacs-lisp
   (defalias 'yes-or-no-p 'y-or-n-p)
 #+end_src
-* ACTIVE Exec.path-from-shell
-#+begin_src emacs-lisp
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize))
-#+end_src
 * ACTIVE Adding local files to load path
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/lisp/")
@@ -110,19 +105,23 @@
     :init
     (doom-modeline-mode))
 
-  ;; (set-background-color "#033f01a90ccc")
-
   (use-package dashboard
     :ensure t
     :config
     (dashboard-setup-startup-hook))
 
-  (setq dashboard-startup-banner "/home/cr0c0/Dokumente/using-emacs/unicorn-resized2.png")
+  (setq dashboard-startup-banner "/home/bu6hunt3r/Dokumente/using-emacs/pony.png")
 
   (use-package nyan-mode
       :ensure t
       :config (nyan-mode +1))
 
+  (use-package tron-legacy-theme
+    :config
+    (setq tron-legacy-theme-vivid-cursor t)
+    (load-theme 'tron-legacy t))
+
+  (set-background-color "#0a0f14")
   ;; (use-package powerline
   ;;   :ensure t
   ;;   :config
@@ -421,7 +420,7 @@
 #+begin_src emacs-lisp
   (setenv "PATH"
 	  (concat
-	   "/home/cr0c0/.gem/ruby/2.7.0/bin" ":"
+	   "/home/bu6hunt3r/.gem/ruby/2.7.0/bin" ":"
 	   (getenv "PATH")))
 
   (use-package ruby-electric
@@ -460,7 +459,7 @@
   :ensure t
   :init
   (progn
-    (load-file "/home/cr0c0/.emacs.d/lisp/linum-highlight-current-line-number.el")
+    (load-file "/home/bu6hunt3r/.emacs.d/lisp/linum-highlight-current-line-number.el")
     (setq linum-format 'linum-highlight-current-line-number)
     ;;(set-face-background 'line-number "#033f01a90ccc")
     ))
@@ -539,31 +538,31 @@
 #+end_src
 * ACTIVE Internal Org mode links 
 #+begin_src emacs-lisp
-(use-package worf
-  :ensure t)
-;; use ivy to insert a link to a heading in the current document
-;; based on `worf-goto`
-(defun my/worf-insert-internal-link ()
-  "Use ivy to insert a link to aheading in the current `org-mode'
-document. Code is based on `worf-goto'."
-   (interactive)
-   (let ((cands (worf--goto-candidates)))
-     (ivy-read "Heading: " cands
- 	      :action 'my/worf-insert-internal-link-action)))
+  ;; (use-package worf
+  ;;   :ensure t)
+  ;; ;; use ivy to insert a link to a heading in the current document
+  ;; ;; based on `worf-goto`
+  ;; (defun my/worf-insert-internal-link ()
+  ;;   "Use ivy to insert a link to aheading in the current `org-mode'
+  ;; document. Code is based on `worf-goto'."
+  ;;    (interactive)
+  ;;    (let ((cands (worf--goto-candidates)))
+  ;;      (ivy-read "Heading: " cands
+  ;;  	      :action 'my/worf-insert-internal-link-action)))
 
- (defun my/worf-insert-internal-link-action (x)
-   "Insert link for `my/worf-insert-internal-link'"
-   ;; goto heading
-   (save-excursion
-     (goto-char (cdr x))
-     ;; store link
-     (call-interactively 'org-store-link)
-     )
-   ;; return to original point and insert link
-   (org-insert-last-stored-link 1)
-   ;; org-insert-last-stored-link adds a newline, so
-   ;; delete this
-   (delete-backward-char 1))
+  ;;  (defun my/worf-insert-internal-link-action (x)
+  ;;    "Insert link for `my/worf-insert-internal-link'"
+  ;;    ;; goto heading
+  ;;    (save-excursion
+  ;;      (goto-char (cdr x))
+  ;;      ;; store link
+  ;;      (call-interactively 'org-store-link)
+  ;;      )
+  ;;    ;; return to original point and insert link
+  ;;    (org-insert-last-stored-link 1)
+  ;;    ;; org-insert-last-stored-link adds a newline, so
+  ;;    ;; delete this
+  ;;    (delete-backward-char 1))
 #+end_src
 * ACTIVE Load cheatsheets
 #+begin_src emacs-lisp
@@ -714,10 +713,10 @@ document. Code is based on `worf-goto'."
   ;;   :bind (("C-'" . better-shell-shell)))
   ;; 	 ;;("C-;" . better-shell-remote-open)))
 
-  (use-package exec-path-from-shell
-    :ensure t
-    :config
-    (exec-path-from-shell-initialize))
+  ;; (use-package exec-path-from-shell
+  ;;   :ensure t
+  ;;   :config
+  ;;   (exec-path-from-shell-initialize))
 
 
       (use-package fish-completion
@@ -1032,24 +1031,24 @@ document. Code is based on `worf-goto'."
 #+begin_src emacs-lisp
   ;; (use-package erlang
   ;;   :ensure t)
-  ;; 
+
   ;; (use-package popup
   ;;   :ensure t)
-  ;; 
+
   ;; (use-package company
   ;;   :ensure t)
-  ;; 
+
   ;; (use-package flycheck-tip
   ;;   :ensure t)
-  ;; 
+
   ;; (setq load-path (cons "/usr/lib/erlang/lib/tools-3.3/emacs"
   ;; 		      load-path))
-  ;; 
+
   ;; (require 'erlang-start)
   ;; (setq erlang-root-dir "/usr/lib/erlang/")
   ;; (setq exec-path (cons "/usr/lib/erlang/bin" exec-path))
   ;; (setq erlang-man-root-dir "/usr/lib/erlang/man")
-  ;; 
+
   ;; ;; flycheck settings
   ;; (require 'flycheck)
   ;; (flycheck-define-checker erlang-otp
@@ -1061,25 +1060,39 @@ document. Code is based on `worf-goto'."
   ;;   ((warning line-start (file-name) ":" line ": Warning:" (message) line-end)
   ;;    (error line-start (file-name) ":" line ": " (message) line-end))
   ;;   :modes  erlang-mode)
-  ;; 
+
   ;; (add-hook 'erlang-mode-hook
   ;; 	  (lambda ()
   ;; 	    (flycheck-select-checker 'erlang-otp)
   ;; 	    (flycheck-mode)))
-  ;; 
+
   ;; ;; setting up distel
   ;; (push "~/.emacs.d/distel/elisp/" load-path)
   ;; (require 'distel)
   ;; (distel-setup)
-  ;; 
+
+  ;; ;; prevent annoying hang-on-compile
+  ;; (defvar inferior-erlang-prompt-timeout t)
+  ;; ;; default node name to emacs@localhost
+  ;; (setq inferior-erlang-machine-options '("-sname" "emacs"))
+  ;; ;; tell distel to default to that node
+  ;; (setq erl-nodename-cache
+  ;;       (make-symbol
+  ;;        (concat
+  ;; 	"emacs@"
+  ;; 	;; Mac OS X uses "name.local" instead of "name", this should work
+  ;; 	;; pretty much anywhere without having to muck with NetInfo
+  ;; 	;; ... but I only tested it on Mac OS X.
+  ;; 	(car (split-string (shell-command-to-string "hostname"))))))
+
   ;; ;; setting up company-distel
   ;; (push "~/.emacs.d/company-distel/" load-path)
   ;; (require 'company-distel)
   ;; (add-to-list 'company-backends 'company-distel)
-  ;; 
+
   ;; ;; enable company just for erlang
   ;; (add-hook 'erlang-mode-hook 'global-company-mode)
-  ;; 
+
   ;; ;; flycheck-tip settings
   ;; (require 'flycheck-tip)
 #+end_src
@@ -1112,6 +1125,8 @@ document. Code is based on `worf-goto'."
   (use-package lsp-ui
     :ensure t
     :commands lsp-ui-mode)
+
+  (setq exec-path (append exec-path '("/home/bu6hunt3r/.ghcup/bin/")))
   (use-package lsp-haskell
    :ensure t
    :config
@@ -1486,7 +1501,7 @@ document. Code is based on `worf-goto'."
 #+end_src
 * ACTIVE golang mode
 #+begin_src emacs-lisp
-(setq exec-path (append exec-path '("/home/cr0c0/go/bin")))
+(setq exec-path (append exec-path '("/home/bu6hunt3r/go/bin")))
 
 (use-package lsp-mode
   :ensure t
@@ -1539,4 +1554,51 @@ document. Code is based on `worf-goto'."
       lsp-ui-sideline-enable t
       lsp-ui-imenu-enable t
       lsp-ui-flycheck-enable t)
+#+end_src
+* ACTIVE rust mode
+#+begin_src emacs-lisp
+  (use-package rust-mode
+    :ensure t)
+
+  (use-package cargo
+    :ensure 
+    :config
+    (add-hook 'rust-mode-hook 'cargo-minor-mode))
+
+  (add-hook 'rust-mode-hook
+	    (lambda ()
+	      (local-set-key (kbd "C-c <tab>") #'rust-format-buffer)))
+
+  (use-package racer
+    :ensure t)
+  (setq racer-cmd "~/.cargo/bin/racer")
+  (setq racer-rust-src-path "~/dev/rust/src")
+
+  (add-hook 'rust-mode-hook #'racer-mode)
+  (add-hook 'racer-mode-hook #'company-mode)
+
+  (setq exec-path (append exec-path '("~/.cargo/bin")))
+  (use-package flycheck-rust
+    :ensure t
+    :config
+    (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+
+  (defun indent-buffer ()
+    "Indent current buffer according to major mode"
+    (interactive)
+    (indent-region (point-min) (point-max)))
+#+end_src
+* ACTIVE lua mode
+#+begin_src emacs-lisp
+  (use-package lua-mode
+    :ensure t)
+
+  (defun my-lua-mode-company-init ()
+    (setq-local company-backends '((company-lua
+				    company-etags))))
+
+  (use-package company-lua
+    :ensure t
+    :config
+    (add-hook 'lua-mode-hook #'my-lua-mode-company-init))
 #+end_src
